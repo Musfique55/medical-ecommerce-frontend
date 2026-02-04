@@ -1,18 +1,24 @@
 import { Categories } from "@/components/Categories";
+import FeaturedProducts from "@/components/FeaturedProducts";
 import { Hero } from "@/components/Hero";
-import { categoryServices } from "@/modules/categories/categories.services";
-import { Suspense } from "react";
+import { categoryServices } from "@/services/categories/categories.services";
+import { productServices } from "@/services/products/products.services";
 
 
-export default function Home() {
-  const categories = categoryServices.getCategories();
+
+export default async function Home() {
+  const categoriesData =  categoryServices.getCategories();
+  const productsData =  productServices.getProducts();
+  const [categories,products] = await Promise.all([
+    categoriesData,productsData
+  ]);
+
+  // console.log(products);
   return (
     <>
       <Hero />
-      <Suspense>
-
-      <Categories categoryPromise={categories}/>
-      </Suspense>
+      <Categories categories={categories}/>
+      <FeaturedProducts products={products.data}/>
     </>
   );
 }

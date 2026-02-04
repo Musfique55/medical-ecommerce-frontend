@@ -1,5 +1,5 @@
 "use client";
-import { Category } from "@/types/category";
+import { Category } from "@/types";
 import Link from "next/link";
 import { use } from "react";
 

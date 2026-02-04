@@ -1,7 +1,7 @@
-"use client"
-import { Category } from '@/types/category';
+
+import { Category } from '@/types';
 import { Pill, Heart, Thermometer, Stethoscope, Baby, Leaf } from 'lucide-react';
-import { use } from 'react';
+
 
 // const categories = [
 //   { icon: Pill, name: 'Pain Relief', color: 'bg-red-100 text-red-600' },
@@ -12,8 +12,8 @@ import { use } from 'react';
 //   { icon: Leaf, name: 'Herbal', color: 'bg-teal-100 text-teal-600' },
 // ];
 
-export function Categories({categoryPromise} : {categoryPromise : Promise<{data : Category[]}>}) {
-    const categories = use(categoryPromise);
+export function Categories({categories} : {categories : {data : Category[]}}) {
+    // const categories = use(categoryPromise);
   return (
     <section className="py-12 bg-gray-50">
       <div className="container mx-auto px-4">
