@@ -2,7 +2,7 @@ import { ProductCard } from './ProductCard';
 import { Product } from '@/types';
 
 const FeaturedProducts = ({products} : {products : {data :Product[]}}) => {
-    console.log(products);
+    // console.dir(products,{depth : Infinity});
     // return;
     return (
         <section className="py-16">

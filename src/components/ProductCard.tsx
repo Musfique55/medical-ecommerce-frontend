@@ -1,9 +1,10 @@
+"use client"
 import { ShoppingCart, Heart } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import Image from 'next/image';
-import { Product } from '@/types';
-// import { ImageWithFallback } from './figma/ImageWithFallback';
+import { discountType, Product } from '@/types';
+
 
 
 
@@ -13,9 +14,13 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-//   const discount = product.originalPrice 
-//     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-//     : 0;
+  const price = product?.discount_type === discountType.FIXED
+    ? Math.round((Number(product?.retails_price) - product?.discount_value)) 
+    : product?.discount_type === discountType.PERCENTAGE ? 
+    (Number(product?.retails_price) - (Number(product?.retails_price) * product?.discount_value) / 100)
+    : product?.retails_price;
+
+    console.log(price);
     
   return (
     <div className="bg-white rounded-xl border hover:shadow-lg transition-shadow duration-300 overflow-hidden group">
@@ -27,12 +32,12 @@ export function ProductCard({ product }: ProductCardProps) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
 
         />
-        {/* {discount > 0 && (
+        {product.discount_value > 0 && (
           <Badge className="absolute top-3 left-3 bg-red-500 hover:bg-red-600">
-            {discount}% OFF
+            {product.discount_value}% OFF
           </Badge>
-        )} */}
-        {!product.stock && (
+        )}
+        {!product.stock  && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <span className="bg-white px-4 py-2 rounded-lg font-semibold">Out of Stock</span>
           </div>
@@ -72,12 +77,12 @@ export function ProductCard({ product }: ProductCardProps) {
 
         <div className="flex items-end justify-between">
           <div>
-            <div className="text-2xl font-bold text-teal-700">${product?.retails_price ? Number(product?.retails_price).toFixed?.(2) : 0}</div>
-            {/* {product.originalPrice && ( */}
+            <div className="text-2xl font-bold text-teal-700">${Number(price).toFixed?.(2)}</div>
+            {product?.discount_value > 0 && (
               <div className="text-sm text-gray-400 line-through">
-                ${product?.retails_price ? product.retails_price?.toFixed?.(2) : 0}
+                ${product?.retails_price ? Number(product.retails_price)?.toFixed?.(2) : 0}   
               </div>
-            {/* )} */}
+             )}
           </div>
           <Button 
             size="icon" 

@@ -22,10 +22,19 @@ export interface Product {
   name: string;
   description: string;
   retails_price: number;
+  discount_type : discountType;
+  discount_value : number;
   image_url: string[];
   category: Category;
   manufacturer : Manufacturer;
   stock: number;
   rating: number;
   reviews: [];
+}
+
+
+export enum discountType {
+  NONE,
+  PERCENTAGE,
+  FIXED
 }
