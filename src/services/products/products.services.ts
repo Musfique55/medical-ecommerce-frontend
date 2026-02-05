@@ -42,5 +42,16 @@ export const productServices = {
             console.log(error);
             return {data : null,error : error}
        }
+    },
+
+    getProduct : async (id : string) => {
+        try {
+            const res = await fetch(`${env.API_URL}/medicines/${id}`);
+            const data = await res.json();
+
+            return {data : data,error : null}
+        } catch (error) {
+            return {data : null,error}
+        }
     }
 }

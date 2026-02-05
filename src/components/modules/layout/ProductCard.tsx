@@ -4,6 +4,7 @@ import { Button } from '../../ui/button';
 import { Badge } from '../../ui/badge';
 import Image from 'next/image';
 import { discountType, Product } from '@/types';
+import Link from 'next/link';
 
 
 
@@ -20,10 +21,13 @@ export function ProductCard({ product }: ProductCardProps) {
     (Number(product?.retails_price) - (Number(product?.retails_price) * product?.discount_value) / 100)
     : product?.retails_price;
 
-    console.log(price);
+  const sanitizeUrl = (slug : string) => {
+    const url = slug.split(" ").join("-");
+    return url; 
+  }
     
   return (
-    <div className="bg-white rounded-xl border hover:shadow-lg transition-shadow duration-300 overflow-hidden group">
+    <Link href={`/products/${sanitizeUrl(product.name)}/${product.id}`} className="bg-white rounded-xl border hover:shadow-lg transition-shadow duration-300 overflow-hidden group">
       <div className="relative overflow-hidden aspect-square">
         <Image
           src={product.image_url[0]}
@@ -94,6 +98,6 @@ export function ProductCard({ product }: ProductCardProps) {
           </Button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
