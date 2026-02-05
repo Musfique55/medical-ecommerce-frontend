@@ -1,9 +1,9 @@
 import  { Suspense } from "react";
 import Navbar from "./Navbar";
 import { categoryServices } from "@/services/categories/categories.services";
-import { Button } from "./ui/button";
+import { Button } from "../../ui/button";
 import { Heart, Menu, Phone, Search, ShoppingCart, User } from "lucide-react";
-import { Input } from "./ui/input";
+import { Input } from "../../ui/input";
 
 const Header = () => {
   const categoryPromise = categoryServices.getCategories();

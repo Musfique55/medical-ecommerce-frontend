@@ -1,7 +1,7 @@
 "use client"
 import { ShoppingCart, Heart } from 'lucide-react';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
+import { Button } from '../../ui/button';
+import { Badge } from '../../ui/badge';
 import Image from 'next/image';
 import { discountType, Product } from '@/types';
 

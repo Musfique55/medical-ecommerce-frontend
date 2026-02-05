@@ -1,4 +1,4 @@
-import { ProductCard } from './ProductCard';
+import { ProductCard } from '../layout/ProductCard';
 import { Product } from '@/types';
 
 const FeaturedProducts = ({products} : {products : {data :Product[]}}) => {

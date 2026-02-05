@@ -1,6 +1,6 @@
 import { ArrowRight, Shield, Truck, Clock } from 'lucide-react';
 import Image from "next/image";
-import { Button } from './ui/button';
+import { Button } from '../../ui/button';
 
 export function Hero() {
   return (
