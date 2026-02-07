@@ -23,6 +23,7 @@ export const cartServices = {
       cartItems.push(item);
     }
     localStorage.setItem("cart", JSON.stringify(cartItems));
+    window.dispatchEvent(new Event("storage"));
   },
 
   removeFromCart: (id: string) => {
@@ -33,13 +34,17 @@ export const cartServices = {
     const remainingItems = cartItems.filter((p) => p.id !== id);
 
     localStorage.setItem("cart", JSON.stringify(remainingItems));
+
+    window.dispatchEvent(new Event("storage"));
   },
 
-  getCartItems: () => {
-    const cartItems: cartItem[] = JSON.parse(
-      localStorage.getItem("cart") || "[]",
-    );
-
-    return cartItems;
+  getCartSnapshot: () => {
+    let cartItems;
+    if(typeof window !== undefined){
+       cartItems = JSON.parse(
+        localStorage.getItem("cart") || "[]",
+      );
+    }
+    return  cartItems.length;
   },
 };

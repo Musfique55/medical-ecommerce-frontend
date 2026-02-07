@@ -9,6 +9,8 @@ import Link from "next/link";
 import Actions from "./Actions";
 import SearchBar from "./SearchBar";
 
+
+
 const Header = () => {
   const categoryPromise = categoryServices.getCategories();
   return (

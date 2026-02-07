@@ -1,16 +1,25 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { cartServices } from "@/services/cart/cart.services";
 import { Heart, Menu, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useSyncExternalStore } from "react";
+
+const subscribe = (callback: () => void) => {
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
+};
+
+const getServerSnapshot = () => {
+  return 0;
+};
 
 const Actions = () => {
-  const [cartItems] = useState(() => {
-    if (typeof window !== undefined) {
-      return JSON.parse(localStorage.getItem("cart") || "[]");
-    }
-    return [];
-  });
+  
+  const cartSnapShot = useSyncExternalStore(subscribe,cartServices.getCartSnapshot,getServerSnapshot);
+
+  // console.log(snapShot);
+
 
   return (
     <div className="flex items-center gap-2">
@@ -28,11 +37,11 @@ const Actions = () => {
         >
           <ShoppingCart className="size-5" />
 
-          {cartItems.length > 0 && (
+          {/* {cartItems.length > 0 && ( */}
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full size-5 flex items-center justify-center">
-              {cartItems.length}
+              {cartSnapShot}
             </span>
-          )}
+          {/* )} */}
         </Button>
       </Link>
 
