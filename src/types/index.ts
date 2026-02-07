@@ -29,9 +29,31 @@ export interface Product {
   manufacturer : Manufacturer;
   stock: number;
   rating: number;
-  reviews: [];
+  reviews: Review[];
 }
 
+export interface cartItem {
+  id : string,
+  name : string
+  image_url : string[]
+  price : number
+  quantity : number
+} 
+
+export interface Review {
+  id : string
+  image_url : string
+  rating : number
+  description : string
+  created_at : string
+  author : Author
+}
+
+interface Author {
+  id : string
+  email : string
+  name : string
+}
 
 export enum discountType {
   NONE,
