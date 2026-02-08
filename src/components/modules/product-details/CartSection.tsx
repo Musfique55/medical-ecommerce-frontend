@@ -4,10 +4,16 @@ import { Button } from '@/components/ui/button';
 import { cartServices } from '@/services/cart/cart.services';
 import { Product } from '@/types';
 import { Heart, Minus, Plus, ShoppingCart } from 'lucide-react';
+import { toast } from 'sonner';
 
 const CartSection = ({product} : {product : Product}) => {
     const [quantity,setQuantity] = useState(1);
     const price   = product.discount_value > 0 ? Math.round(product.retails_price - ((product.retails_price * product.discount_value) / 100)).toFixed(2) : Number(product?.retails_price);
+
+    const handleCart = (product : Product,quantity:number,price:number) => {
+      cartServices.addToCart(product,quantity,price);
+      toast.success("item added to the cart");
+    }
     return (
         <div>
             <div className="space-y-4">
@@ -52,7 +58,7 @@ const CartSection = ({product} : {product : Product}) => {
               <Button
                 size="lg"
                 className="flex-1 bg-blue-600 hover:bg-blue-700 h-16 text-lg font-semibold rounded-2xl shadow-lg shadow-blue-200 hover:shadow-xl transition-all"
-                onClick={() => cartServices.addToCart(product,quantity,Number(price))}
+                onClick={() => handleCart(product,quantity,Number(price))}
                 disabled={product.stock === 0}
               >
                 <ShoppingCart className="size-6 mr-2" />

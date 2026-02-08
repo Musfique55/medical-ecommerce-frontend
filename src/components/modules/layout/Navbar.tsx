@@ -13,7 +13,7 @@ const Navbar = ({ categoryPromise }: {categoryPromise : Promise<{data : Category
             <li>
               <Link
                 href="#"
-                className="text-teal-700 font-semibold hover:text-teal-800"
+                className="text-teal-700 font-semibold hover:text-teal-800 text-nowrap text-xs"
               >
                 All Categories
               </Link>
@@ -23,7 +23,7 @@ const Navbar = ({ categoryPromise }: {categoryPromise : Promise<{data : Category
                 <li key={item.id}>
                   <Link
                     href={`/category/${item.slug}`}
-                    className="text-teal-700 font-semibold hover:text-teal-800"
+                    className="text-teal-700 font-semibold hover:text-teal-800 text-nowrap text-xs"
                   >
                     {item.category_name}
                   </Link>

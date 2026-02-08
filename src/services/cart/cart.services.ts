@@ -39,12 +39,15 @@ export const cartServices = {
   },
 
   getCartSnapshot: () => {
-    let cartItems;
+    let cartTotal = 0;
     if(typeof window !== undefined){
-       cartItems = JSON.parse(
+      const cartItems : cartItem[] = JSON.parse(
         localStorage.getItem("cart") || "[]",
       );
+      cartTotal = cartItems.reduce((prev,curr) => prev += curr.quantity,0);
     }
-    return  cartItems.length;
+
+
+    return  cartTotal;
   },
 };

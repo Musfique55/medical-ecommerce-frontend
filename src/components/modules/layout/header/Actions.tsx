@@ -18,7 +18,6 @@ const Actions = () => {
   
   const cartSnapShot = useSyncExternalStore(subscribe,cartServices.getCartSnapshot,getServerSnapshot);
 
-  // console.log(snapShot);
 
 
   return (
