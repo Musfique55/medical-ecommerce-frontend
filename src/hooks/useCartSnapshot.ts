@@ -12,10 +12,16 @@ const itemsServerSnapshot = () => {
     return "[]";
 }
 
-const useCartSnapshot = () => {
-   const getCartItemsSnapshot = useSyncExternalStore(subscribe,cartServices.getCartItemsSnapshot,itemsServerSnapshot)
+const totalItemsServerSnapshot = () => {
+    return 0;
+}
 
-   return {getCartItemsSnapshot}
+const useCartSnapshot = () => {
+   const getCartItemsSnapshot = useSyncExternalStore(subscribe,cartServices.getCartItemsSnapshot,itemsServerSnapshot);
+
+   const getTotalItemsSnapshot = useSyncExternalStore(subscribe,cartServices.getCartSnapshot,totalItemsServerSnapshot);
+
+   return {getCartItemsSnapshot,getTotalItemsSnapshot}
 };
 
 export default useCartSnapshot;

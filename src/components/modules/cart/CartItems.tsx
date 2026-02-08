@@ -1,7 +1,7 @@
 "use client";
 import { cartServices } from "@/services/cart/cart.services";
 import { cartItem } from "@/types";
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Trash2,
@@ -16,27 +16,17 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import useCartSnapshot from "@/hooks/useCartSnapshot";
 
-const subscribe = (callback: () => void) => {
-  window.addEventListener("storage", callback);
-  return () => window.removeEventListener("storage", callback);
-};
 
-const getServerSnapshot = () => {
-  return "[]";
-};
 
 const CartItems = () => {
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
 
-  const getCartSnapshot = useSyncExternalStore(
-    subscribe,
-    cartServices.getCartItemsSnapshot,
-    getServerSnapshot,
-  );
+  const getCartSnapshot = useCartSnapshot();
 
-  const items: cartItem[] = JSON.parse(getCartSnapshot);
+  const items: cartItem[] = JSON.parse(getCartSnapshot.getCartItemsSnapshot);
 
   const handleApplyPromo = () => {
     if (promoCode.toLowerCase() === "health10") {
