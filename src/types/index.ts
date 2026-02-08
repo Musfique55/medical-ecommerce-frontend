@@ -38,6 +38,8 @@ export interface cartItem {
   image_url : string[]
   price : number
   quantity : number
+  category : string
+  description : string
 } 
 
 export interface Review {

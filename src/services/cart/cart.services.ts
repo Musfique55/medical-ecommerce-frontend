@@ -5,8 +5,10 @@ export const cartServices = {
     const item = {
       id: product.id,
       name: product.name,
+      description: product.description,
       price,
       quantity,
+      category: product.category.category_name,
       stock: product.stock,
       image_url: product.image_url,
     };
@@ -26,6 +28,26 @@ export const cartServices = {
     window.dispatchEvent(new Event("storage"));
   },
 
+  updateQuantity: (id: string, quantity: number) => {
+    const cartItems: cartItem[] = JSON.parse(
+      localStorage.getItem("cart") || "[]",
+    );
+
+   
+
+    const updatedQuantity = cartItems.map((p) => {
+      if (p.id === id) {
+          p.quantity += quantity;
+      }
+
+      return p;
+    });
+    
+    localStorage.setItem("cart",JSON.stringify(updatedQuantity));
+
+    window.dispatchEvent(new Event("storage"));
+  },
+
   removeFromCart: (id: string) => {
     const cartItems: cartItem[] = JSON.parse(
       localStorage.getItem("cart") || "[]",
@@ -40,14 +62,18 @@ export const cartServices = {
 
   getCartSnapshot: () => {
     let cartTotal = 0;
-    if(typeof window !== undefined){
-      const cartItems : cartItem[] = JSON.parse(
+    if (typeof window !== undefined) {
+      const cartItems: cartItem[] = JSON.parse(
         localStorage.getItem("cart") || "[]",
       );
-      cartTotal = cartItems.reduce((prev,curr) => prev += curr.quantity,0);
+      cartTotal = cartItems.reduce((prev, curr) => (prev += curr.quantity), 0);
     }
 
+    return cartTotal;
+  },
 
-    return  cartTotal;
+  getCartItemsSnapshot: () => {
+    if (typeof window === undefined) return "[]";
+    return localStorage.getItem("cart") || "[]";
   },
 };
