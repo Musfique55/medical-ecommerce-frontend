@@ -1,11 +1,13 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import useCartSnapshot from "@/hooks/useCartSnapshot";
+import useSteps from "@/hooks/useSteps";
 import { cartItem } from "@/types";
 import { CheckCircle2, Shield, Truck } from "lucide-react";
 
 const OrderSummary = () => {
   const cartSnapShot = useCartSnapshot();
+  
 
   const items: cartItem[] = JSON.parse(cartSnapShot.getCartItemsSnapshot);
 

@@ -1,7 +1,10 @@
+"use client"
+import useSteps from "@/hooks/useSteps";
 import { CheckCircle2 } from "lucide-react";
-import React from "react";
+
 
 const CheckoutSteps = () => {
+    const steps = useSteps((state) => state.steps);
   return (
     <div className="container mx-auto mt-10">
       <div className="mb-8">
@@ -16,11 +19,7 @@ const CheckoutSteps = () => {
       {/* Progress Steps */}
       <div className="mb-12">
         <div className="flex items-center justify-center gap-4 max-w-2xl mx-auto">
-          {[
-            { num: 1, label: "Cart", active: false, complete: true },
-            { num: 2, label: "Checkout", active: true, complete: false },
-            { num: 3, label: "Confirmation", active: false, complete: false },
-          ].map((step, idx) => (
+          {steps.map((step, idx) => (
             <div key={step.num} className="flex items-center flex-1">
               <div className="flex flex-col items-center flex-1">
                 <div

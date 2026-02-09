@@ -8,6 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import useSteps from "@/hooks/useSteps";
 import { useForm } from "@tanstack/react-form";
 import {
   AlertCircle,
@@ -20,6 +21,7 @@ import {
 } from "lucide-react";
 
 const Form = () => {
+  const updateStep = useSteps((state) => state.updateStep);
   const form = useForm({
     defaultValues: {
       firstName: "",
@@ -34,7 +36,8 @@ const Form = () => {
     },
     onSubmit: async ({ value }) => {
       // Do something with form data
-      console.log(value);
+      // console.log(value);
+      updateStep(2);
     },
   });
 

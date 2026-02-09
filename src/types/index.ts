@@ -57,8 +57,17 @@ interface Author {
   name : string
 }
 
+export interface Step{
+   num : number
+   active : boolean
+   complete : boolean
+   label : string
+}
+
 export enum discountType {
   NONE,
   PERCENTAGE,
   FIXED
 }
+
+
