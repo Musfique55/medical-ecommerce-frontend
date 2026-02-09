@@ -7,8 +7,6 @@ import { CheckCircle2, Shield, Truck } from "lucide-react";
 
 const OrderSummary = () => {
   const cartSnapShot = useCartSnapshot();
-  
-
   const items: cartItem[] = JSON.parse(cartSnapShot.getCartItemsSnapshot);
 
   const subtotal = items.reduce(

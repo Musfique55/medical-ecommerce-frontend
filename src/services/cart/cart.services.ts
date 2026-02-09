@@ -60,6 +60,10 @@ export const cartServices = {
     window.dispatchEvent(new Event("storage"));
   },
 
+  clearCart : () => {
+    localStorage.removeItem("cart");
+  },
+
   getCartSnapshot: () => {
     let cartTotal = 0;
     if (typeof window !== undefined) {

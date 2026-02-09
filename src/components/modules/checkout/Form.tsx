@@ -1,4 +1,5 @@
 "use client";
+import { placeOrder } from "@/actions/checkout.action";
 import {
   Field,
   FieldError,
@@ -6,22 +7,41 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import useCartSnapshot from "@/hooks/useCartSnapshot";
 import useSteps from "@/hooks/useSteps";
+import { cartServices } from "@/services/cart/cart.services";
+import { cartItem } from "@/types";
 import { useForm } from "@tanstack/react-form";
-import {
-  AlertCircle,
-  CheckCircle2,
-  CreditCard,
-  Home,
-  MapPin,
-  Shield,
-  User,
-} from "lucide-react";
+import { CheckCircle2, CreditCard, MapPin, Shield, User } from "lucide-react";
+import { toast } from "sonner";
+import * as z from "zod";
+
+const formSchema = z.object({
+  firstName: z.string().min(1, "this field is required"),
+  lastName: z.string().min(1, "this field is required"),
+  email: z.string().email().nonempty("this field is required"),
+  phone: z
+    .string()
+    .min(11, "phone number must be 11 digits")
+    .max(11, "phone number must be 11 digits"),
+  street_address: z.string().min(1, "this field is required"),
+  apartment: z.string().optional().default(""),
+  city: z.string().min(1, "this field is required"),
+  zip_code: z.string().min(4, "zip code must be 4 numbers"),
+  special_instruction: z.string().optional().default(""),
+});
 
 const Form = () => {
+  const cartSnapShot = useCartSnapshot();
+  const items: cartItem[] = JSON.parse(cartSnapShot.getCartItemsSnapshot);
+  const subTotal = items.reduce(
+    (sum, curr) => (sum += curr.price * curr.quantity),
+    0,
+  );
+
   const updateStep = useSteps((state) => state.updateStep);
+
   const form = useForm({
     defaultValues: {
       firstName: "",
@@ -32,12 +52,40 @@ const Form = () => {
       apartment: "",
       city: "",
       zip_code: "",
-      special_instruction : "",
+      special_instruction: "",
     },
+    validators: { onSubmit: formSchema },
     onSubmit: async ({ value }) => {
-      // Do something with form data
-      // console.log(value);
-      updateStep(2);
+      const orderSchema = {
+        customer_id: "zW9kXLeuVLLU8spcNCYZ83fF5F6ew9jD",
+        subtotal: subTotal,
+        total_amount: subTotal,
+        order_items: items.map((item) => ({
+          product_id: item.id,
+          quantity: item.quantity,
+          unit_price: item.price,
+        })),
+        delivery_method: "COD",
+        shipping_address: {
+          fullName: value.firstName + value.lastName,
+          email: value.email,
+          phone: value.phone,
+          street_address: value.street_address,
+          apartment: value.apartment,
+          city: value.city,
+          zip_code: value.zip_code,
+          special_instruction: value.special_instruction,
+        },
+      };
+      const toastId = toast.loading("Order is placing...");
+      try {
+        await placeOrder(orderSchema);
+        toast.success("order placed successfully", { id: toastId });
+        cartServices.clearCart();
+        updateStep(2);
+      } catch (error: any) {
+        toast.error(error.message || "something went wrong", { id: toastId });
+      }
     },
   });
 
@@ -171,6 +219,8 @@ const Form = () => {
                 <form.Field
                   name="street_address"
                   children={(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid;
                     return (
                       <Field>
                         <FieldLabel htmlFor={field.name}>
@@ -183,6 +233,9 @@ const Form = () => {
                           onChange={(e) => field.handleChange(e.target.value)}
                           className={`h-12 bg-blue-50/50 border-blue-200 rounded-xl text-base`}
                         />
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
                       </Field>
                     );
                   }}
@@ -210,6 +263,8 @@ const Form = () => {
                   <form.Field
                     name="city"
                     children={(field) => {
+                      const isInvalid =
+                        field.state.meta.isTouched && !field.state.meta.isValid;
                       return (
                         <Field>
                           <FieldLabel htmlFor={field.name}>City</FieldLabel>
@@ -220,6 +275,9 @@ const Form = () => {
                             onChange={(e) => field.handleChange(e.target.value)}
                             className={`h-12 bg-blue-50/50 border-blue-200 rounded-xl text-base`}
                           />
+                          {isInvalid && (
+                            <FieldError errors={field.state.meta.errors} />
+                          )}
                         </Field>
                       );
                     }}
@@ -227,6 +285,8 @@ const Form = () => {
                   <form.Field
                     name="zip_code"
                     children={(field) => {
+                      const isInvalid =
+                        field.state.meta.isTouched && !field.state.meta.isValid;
                       return (
                         <Field>
                           <FieldLabel htmlFor={field.name}>ZIP Code</FieldLabel>
@@ -237,6 +297,9 @@ const Form = () => {
                             onChange={(e) => field.handleChange(e.target.value)}
                             className={`h-12 bg-blue-50/50 border-blue-200 rounded-xl text-base`}
                           />
+                          {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
                         </Field>
                       );
                     }}
@@ -259,7 +322,7 @@ const Form = () => {
 
             <div className="bg-linear-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200">
               <div className="flex items-start gap-4">
-                <div className="bg-green-600 size-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="bg-green-600 size-6 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                   <CheckCircle2 className="size-4 text-white" />
                 </div>
                 <div className="flex-1">
