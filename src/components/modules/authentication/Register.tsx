@@ -4,10 +4,8 @@ import {
   Mail,
   Lock,
   Eye,
-  EyeOff,
-  AlertCircle,
   User,
-  Phone,
+  EyeOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +14,8 @@ import * as z from "zod";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { authClient } from "@/lib/authClient";
+import { FieldError } from "@/components/ui/field";
+import Link from "next/link";
 
 const schema = z.object({
   fullName: z.string().min(5, "name should have at least 5 characters"),
@@ -24,30 +24,23 @@ const schema = z.object({
     .string()
     .min(8, "password length must be minimum 8")
     .max(32, "password length cannot exceed 32"),
-  phone: z.string().optional(),
+  phone: z
+    .string()
+    .min(11, "phone number digit must be 11")
+    .max(11, "phone number digit must be 11"),
 });
 
 export function Register() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const [errors, setErrors] = useState<{
-    name?: string;
-    email?: string;
-    password?: string;
-    phone?: string;
-    terms?: string;
-  }>({});
+
 
   const form = useForm({
     defaultValues: {
       email: "",
       password: "",
-      fullName : "",
-      phone : "",
+      fullName: "",
+      phone: "",
     },
     validators: { onSubmit: schema },
     onSubmit: async ({ value }) => {
@@ -56,9 +49,9 @@ export function Register() {
         const { data, error } = await authClient.signUp.email({
           email: value.email,
           password: value.password,
-          name : value.fullName,
-          phone : value.phone || undefined
-        //   callbackURL: "http://localhost:3000/checkout",
+          name: value.fullName,
+          phone: value.phone,
+          //   callbackURL: "http://localhost:3000/checkout",
         });
         if (error?.message) {
           toast.error(error.message, { id: toastId });
@@ -72,76 +65,6 @@ export function Register() {
     },
   });
 
-  const validateForm = (): boolean => {
-    const newErrors: {
-      name?: string;
-      email?: string;
-      password?: string;
-      phone?: string;
-      terms?: string;
-    } = {};
-
-    if (!name.trim()) {
-      newErrors.name = "Name is required";
-    } else if (name.trim().length < 2) {
-      newErrors.name = "Name must be at least 2 characters";
-    }
-
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Invalid email address";
-    }
-
-    if (!password) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-      newErrors.password =
-        "Password must contain uppercase, lowercase, and number";
-    }
-
-    if (!phone.trim()) {
-      newErrors.phone = "Phone number is required";
-    } else if (!/^\d{10}$/.test(phone.replace(/\D/g, ""))) {
-      newErrors.phone = "Please enter a valid 10-digit phone number";
-    }
-
-    if (!acceptTerms) {
-      newErrors.terms = "You must accept the terms and conditions";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (validateForm()) {
-      //   onRegister(name, email, password, phone);
-    }
-  };
-
-  const getPasswordStrength = () => {
-    if (!password) return { strength: 0, label: "", color: "" };
-
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (password.length >= 12) strength++;
-    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-    if (/\d/.test(password)) strength++;
-    if (/[^a-zA-Z0-9]/.test(password)) strength++;
-
-    if (strength <= 2) return { strength, label: "Weak", color: "bg-red-500" };
-    if (strength <= 3)
-      return { strength, label: "Fair", color: "bg-yellow-500" };
-    if (strength <= 4) return { strength, label: "Good", color: "bg-blue-500" };
-    return { strength, label: "Strong", color: "bg-green-500" };
-  };
-
-  const passwordStrength = getPasswordStrength();
 
   return (
     <div className="min-h-screen bg-linear-to-b from-blue-50/30 to-white flex items-center justify-center px-6 py-12">
@@ -156,228 +79,163 @@ export function Register() {
 
         {/* Registration Form */}
         <div className="bg-white rounded-3xl p-8 border border-blue-100 shadow-xl shadow-blue-100/50">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Name */}
-            <div>
-              <Label
-                htmlFor="name"
-                className="text-base font-semibold text-gray-900 mb-2"
-              >
-                Full Name
-              </Label>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="John Doe"
-                  value={name}
-                  onChange={(e) => {
-                    setName(e.target.value);
-                    if (errors.name) setErrors({ ...errors, name: undefined });
-                  }}
-                  className={`h-14 pl-12 bg-blue-50/50 border-blue-200 rounded-xl text-base ${
-                    errors.name ? "border-red-500" : ""
-                  }`}
-                />
-              </div>
-              {errors.name && (
-                <p className="text-red-600 text-sm mt-2 flex items-center gap-1">
-                  <AlertCircle className="size-4" />
-                  {errors.name}
-                </p>
-              )}
-            </div>
-
-            {/* Email */}
-            <div>
-              <Label
-                htmlFor="email"
-                className="text-base font-semibold text-gray-900 mb-2"
-              >
-                Email Address
-              </Label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="john@example.com"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (errors.email)
-                      setErrors({ ...errors, email: undefined });
-                  }}
-                  className={`h-14 pl-12 bg-blue-50/50 border-blue-200 rounded-xl text-base ${
-                    errors.email ? "border-red-500" : ""
-                  }`}
-                />
-              </div>
-              {errors.email && (
-                <p className="text-red-600 text-sm mt-2 flex items-center gap-1">
-                  <AlertCircle className="size-4" />
-                  {errors.email}
-                </p>
-              )}
-            </div>
-
-            {/* Phone */}
-            <div>
-              <Label
-                htmlFor="phone"
-                className="text-base font-semibold text-gray-900 mb-2"
-              >
-                Phone Number
-              </Label>
-              <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="(555) 123-4567"
-                  value={phone}
-                  onChange={(e) => {
-                    setPhone(e.target.value);
-                    if (errors.phone)
-                      setErrors({ ...errors, phone: undefined });
-                  }}
-                  className={`h-14 pl-12 bg-blue-50/50 border-blue-200 rounded-xl text-base ${
-                    errors.phone ? "border-red-500" : ""
-                  }`}
-                />
-              </div>
-              {errors.phone && (
-                <p className="text-red-600 text-sm mt-2 flex items-center gap-1">
-                  <AlertCircle className="size-4" />
-                  {errors.phone}
-                </p>
-              )}
-            </div>
-
-            {/* Password */}
-            <div>
-              <Label
-                htmlFor="password"
-                className="text-base font-semibold text-gray-900 mb-2"
-              >
-                Password
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Create a strong password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (errors.password)
-                      setErrors({ ...errors, password: undefined });
-                  }}
-                  className={`h-14 pl-12 pr-12 bg-blue-50/50 border-blue-200 rounded-xl text-base ${
-                    errors.password ? "border-red-500" : ""
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? (
-                    <EyeOff className="size-5" />
-                  ) : (
-                    <Eye className="size-5" />
-                  )}
-                </button>
-              </div>
-
-              {/* Password Strength Indicator */}
-              {password && (
-                <div className="mt-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-300 ${passwordStrength.color}`}
-                        style={{
-                          width: `${(passwordStrength.strength / 5) * 100}%`,
-                        }}
-                      />
-                    </div>
-                    <span
-                      className={`text-xs font-semibold ${
-                        passwordStrength.strength <= 2
-                          ? "text-red-600"
-                          : passwordStrength.strength <= 3
-                            ? "text-yellow-600"
-                            : passwordStrength.strength <= 4
-                              ? "text-blue-600"
-                              : "text-green-600"
-                      }`}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
+            }}
+            className="space-y-6"
+          >
+            <form.Field
+              name="fullName"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <div>
+                    <Label
+                      htmlFor="name"
+                      className="text-base font-semibold text-gray-900 mb-2"
                     >
-                      {passwordStrength.label}
-                    </span>
+                      Full Name
+                    </Label>
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
+                      <Input
+                        id={field.name}
+                        type="text"
+                        placeholder="John Doe"
+                        value={field.state.value}
+                        onChange={(e) => {
+                          field.handleChange(e.target.value);
+                        }}
+                        className={`h-14 pl-12 bg-blue-50/50 border-blue-200 rounded-xl text-base`}
+                      />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              }}
+            />
 
-              {errors.password && (
-                <p className="text-red-600 text-sm mt-2 flex items-center gap-1">
-                  <AlertCircle className="size-4" />
-                  {errors.password}
-                </p>
-              )}
+            <form.Field
+              name="phone"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <div>
+                    <Label
+                      htmlFor="email"
+                      className="text-base font-semibold text-gray-900 mb-2"
+                    >
+                      Phone
+                    </Label>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
+                      <Input
+                        id={field.name}
+                        type="text"
+                        placeholder="01******"
+                        value={field.state.value}
+                        onChange={(e) => {
+                          field.handleChange(e.target.value);
+                        }}
+                        className={`h-14 pl-12 bg-blue-50/50 border-blue-200 rounded-xl text-base`}
+                      />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </div>
+                  </div>
+                );
+              }}
+            />
+            <form.Field
+              name="email"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <div>
+                    <Label
+                      htmlFor="email"
+                      className="text-base font-semibold text-gray-900 mb-2"
+                    >
+                      Email Address
+                    </Label>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
+                      <Input
+                        id={field.name}
+                        type="email"
+                        placeholder="john@example.com"
+                        value={field.state.value}
+                        onChange={(e) => {
+                          field.handleChange(e.target.value);
+                        }}
+                        className={`h-14 pl-12 bg-blue-50/50 border-blue-200 rounded-xl text-base`}
+                      />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </div>
+                  </div>
+                );
+              }}
+            />
 
-              <p className="text-xs text-gray-600 mt-2">
-                Use 8+ characters with uppercase, lowercase, and numbers
-              </p>
-            </div>
-
-            {/* Terms & Conditions */}
-            <div>
-              <div className="flex items-start">
-                <input
-                  id="terms"
-                  type="checkbox"
-                  checked={acceptTerms}
-                  onChange={(e) => {
-                    setAcceptTerms(e.target.checked);
-                    if (errors.terms)
-                      setErrors({ ...errors, terms: undefined });
-                  }}
-                  className={`mt-1 size-5 rounded-lg border-blue-300 text-blue-600 focus:ring-blue-500 focus:ring-offset-0 ${
-                    errors.terms ? "border-red-500" : ""
-                  }`}
-                />
-                <label htmlFor="terms" className="ml-3 text-sm text-gray-700">
-                  I agree to the{" "}
-                  <button
-                    type="button"
-                    className="text-blue-600 hover:text-blue-700 font-semibold"
-                  >
-                    Terms of Service
-                  </button>{" "}
-                  and{" "}
-                  <button
-                    type="button"
-                    className="text-blue-600 hover:text-blue-700 font-semibold"
-                  >
-                    Privacy Policy
-                  </button>
-                </label>
-              </div>
-              {errors.terms && (
-                <p className="text-red-600 text-sm mt-2 flex items-center gap-1">
-                  <AlertCircle className="size-4" />
-                  {errors.terms}
-                </p>
-              )}
-            </div>
+            <form.Field
+              name="password"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <div>
+                    <Label
+                      htmlFor="email"
+                      className="text-base font-semibold text-gray-900 mb-2"
+                    >
+                      Password
+                    </Label>
+                    <div className="relative">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
+                      <Input
+                        id={field.name}
+                        type={showPassword ? "text" : "password"}
+                        placeholder="enter your password"
+                        value={field.state.value}
+                        onChange={(e) => {
+                          field.handleChange(e.target.value);
+                        }}
+                        className={`h-14 pl-12 bg-blue-50/50 border-blue-200 rounded-xl text-base`}
+                      />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="size-5" />
+                        ) : (
+                          <Eye className="size-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              }}
+            />
 
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 h-14 text-base font-semibold rounded-xl shadow-lg shadow-blue-200 hover:shadow-xl transition-all"
+              className="w-full bg-blue-600 hover:bg-blue-700 h-14 text-base font-semibold rounded-xl shadow-lg shadow-blue-200 hover:shadow-xl transition-all cursor-pointer"
             >
               Create Account
             </Button>
@@ -428,12 +286,12 @@ export function Register() {
         <div className="text-center mt-8">
           <p className="text-gray-600">
             Already have an account?{" "}
-            <button
-              //   onClick={onSwitchToLogin}
+            <Link
+              href={"/login"}
               className="text-blue-600 hover:text-blue-700 font-semibold"
             >
               Sign in
-            </button>
+            </Link>
           </p>
         </div>
 
