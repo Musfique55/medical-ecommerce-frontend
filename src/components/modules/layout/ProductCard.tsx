@@ -27,14 +27,14 @@ export function ProductCard({ product }: ProductCardProps) {
   }
     
   return (
-    <Link href={`/products/${sanitizeUrl(product.name)}/${product.id}`} className="bg-white rounded-xl border hover:shadow-lg transition-shadow duration-300 overflow-hidden group">
-      <div className="relative overflow-hidden aspect-square">
+    <Link href={`/products/${sanitizeUrl(product.name)}/${product.id}`} className="bg-white rounded-xl border hover:shadow-lg transition-shadow duration-300 overflow-hidden group max-h-[430px]">
+      <div className="relative overflow-hidden">
         <Image
           src={product.image_url[0]}
           alt={product.name}
-          fill
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-
+          height={200}
+          width={200}
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
         {product.discount_value > 0 && (
           <Badge className="absolute top-3 left-3 bg-red-500 hover:bg-red-600">
@@ -57,10 +57,10 @@ export function ProductCard({ product }: ProductCardProps) {
 
       <div className="p-4">
         <div className="text-xs text-teal-600 font-semibold mb-1">{product.category.category_name}</div>
-        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[2.5rem]">
+        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 min-h-10">
           {product.name}
         </h3>
-        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{product.description}</p>
+        <p className="text-sm text-gray-600 mb-3 line-clamp-2 h-10">{product.description}</p>
         
         <div className="flex items-center gap-1 mb-3">
           <div className="flex">

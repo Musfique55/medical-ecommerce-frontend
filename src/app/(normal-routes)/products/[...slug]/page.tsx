@@ -6,7 +6,7 @@ import { Product } from "@/types";
 
 export const generateStaticParams = async() => {
     const {data} = await productServices.getProducts();
-    return data?.data.map((product : Product) => ({id : product.id})).splice(0,3);
+    return data.data.map((product : Product) => ({id : product.id})).splice(0,3);
 }
 
 const ProductDetails = async ({
@@ -24,7 +24,7 @@ const ProductDetails = async ({
     <div>
       <div className="container mx-auto px-6 py-12 lg:py-16">
         {/* Main Product Section */}
-        <ProductInfo product={productData.data?.data}/>
+        <ProductInfo product={productData.data}/>
       </div>
     </div>
   );

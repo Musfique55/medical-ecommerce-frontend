@@ -5,6 +5,7 @@ export interface Category {
   slug: string;
   icon_url: string;
   is_active: boolean;
+  product_count: number;
 }
 
 export interface Manufacturer {
@@ -65,27 +66,39 @@ export interface Step {
 }
 
 interface OrderItem {
-  product_id : string
-  quantity : number
-  unit_price : number
+  product_id: string;
+  quantity: number;
+  unit_price: number;
 }
 
 export interface Order {
   customer_id: string;
   subtotal: number;
   total_amount: number;
-  order_items: OrderItem[]
+  order_items: OrderItem[];
   delivery_method: string;
   shipping_address: {
-    fullName: string
-    email: string
-    phone: string
-    street_address: string
-    apartment? : string
-    special_instruction? : string
-    city: string
-    zip_code: string
+    fullName: string;
+    email: string;
+    phone: string;
+    street_address: string;
+    apartment?: string;
+    special_instruction?: string;
+    city: string;
+    zip_code: string;
   };
+}
+
+export interface Manufacturer {
+  id: string;
+  name: string;
+  description: string;
+  logo_url: string;
+  country: string;
+  is_active: boolean;
+  medicine_count: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export enum discountType {
