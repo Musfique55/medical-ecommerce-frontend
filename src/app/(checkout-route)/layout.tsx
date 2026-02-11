@@ -2,7 +2,7 @@ import CheckoutSteps from "@/components/modules/checkout/CheckoutSteps";
 import { Footer } from "@/components/modules/layout/Footer";
 import Header from "@/components/modules/layout/header/Header";
 
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+const CheckoutLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div>
       <Header />
@@ -13,4 +13,4 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default DashboardLayout;
+export default CheckoutLayout;

@@ -1,4 +1,4 @@
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Form from "@/components/modules/checkout/Form";
 import OrderSummary from "@/components/modules/checkout/OrderSummary";
 import Link from "next/link";

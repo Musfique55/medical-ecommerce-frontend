@@ -4,18 +4,17 @@ import useCartSnapshot from "@/hooks/useCartSnapshot";
 import { Heart, Menu, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 
-
-
-
 const Actions = () => {
   
   const { getTotalItemsSnapshot} = useCartSnapshot();
 
   return (
     <div className="flex items-center gap-2">
-      <Button variant="ghost" size="icon" className="hidden md:flex">
-        <User className="size-5" />
-      </Button>
+      <Link href={"/dashboard"}>
+        <Button variant="ghost" size="icon" className="hidden md:flex cursor-pointer">
+          <User className="size-5" />
+        </Button>
+      </Link>
       <Button variant="ghost" size="icon" className="hidden md:flex">
         <Heart className="size-5" />
       </Button>

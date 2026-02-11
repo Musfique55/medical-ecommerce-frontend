@@ -65,14 +65,43 @@ export interface Step {
   label: string;
 }
 
-interface OrderItem {
+export interface OrderItemPayload {
   product_id: string;
   quantity: number;
   unit_price: number;
 }
 
-export interface Order {
+export interface OrderItem {
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  id: string;
+  name: string;
+  description: string;
+  retails_price: number;
+}
+
+export interface OrderPayload {
   customer_id: string;
+  subtotal: number;
+  total_amount: number;
+  order_items: OrderItemPayload[];
+  delivery_method: string;
+  shipping_address: {
+    fullName: string;
+    email: string;
+    phone: string;
+    street_address: string;
+    apartment?: string;
+    special_instruction?: string;
+    city: string;
+    zip_code: string;
+  };
+}
+
+export interface Order {
+  id: string;
+  order_number: string;
   subtotal: number;
   total_amount: number;
   order_items: OrderItem[];
