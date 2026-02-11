@@ -12,7 +12,7 @@ const Navbar = ({ categoryPromise }: {categoryPromise : Promise<{data : Category
           <ul className="flex items-center gap-8 py-3 text-sm">
             <li>
               <Link
-                href="#"
+                href="/category"
                 className="text-teal-700 font-semibold hover:text-teal-800 text-nowrap text-xs"
               >
                 All Categories

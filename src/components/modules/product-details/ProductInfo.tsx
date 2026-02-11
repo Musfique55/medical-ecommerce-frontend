@@ -2,9 +2,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types";
 import {
-  ArrowLeft,
   Check,
-  ChevronRight,
   RotateCcw,
   Shield,
   Star,
@@ -13,37 +11,12 @@ import {
 import Image from "next/image";
 import CartSection from "./CartSection";
 import TabsSection from "./TabsSection";
-import { useRouter } from "next/navigation";
+
 
 const ProductInfo = ({ product }: { product: Product }) => {
-  const router = useRouter();
-
-  const handleBack = () => {
-    router.back();
-  };
+  
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50/30 to-white">
-      <div className="bg-white border-b border-blue-100">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center gap-2 text-sm">
-            <button
-              onClick={handleBack}
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors cursor-pointer"
-            >
-              <ArrowLeft className="size-4" />
-              Back to Shop
-            </button>
-            <ChevronRight className="size-4 text-gray-400" />
-            <span className="text-gray-600">
-              {product?.category?.category_name}
-            </span>
-            <ChevronRight className="size-4 text-gray-400" />
-            <span className="text-gray-900 font-medium truncate max-w-xs">
-              {product?.name}
-            </span>
-          </div>
-        </div>
-      </div>
 
       <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 mb-16">
         {/* Image Gallery */}

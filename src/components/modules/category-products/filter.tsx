@@ -1,53 +1,40 @@
 "use client";
 import { Slider } from "@/components/ui/slider";
-import { Category, Manufacturer, Product } from "@/types";
+import { Category, Manufacturer } from "@/types";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { startTransition, useMemo, useOptimistic, useState } from "react";
 
 
 export default function Filters({
   categories,
   manufacturers,
-  products,
-  maxPrice
+  maxPrice,
 }: {
   categories: Category[];
   manufacturers: Manufacturer[];
-  products : Product[];
-  maxPrice : number
+  maxPrice: number;
 }) {
-
   const router = useRouter();
   const searchParams = useSearchParams();
   const manufacturer = searchParams.get("manufacturer");
+  const [optimistic, setOptimistic] = useOptimistic(manufacturer);
 
-  const [priceRange,setPriceRange] = useState([maxPrice || 0]);
-
+  const [priceRange, setPriceRange] = useState([maxPrice || 0]);
 
   const handleMnu = (key: string, value: any) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set(key, value);
-    router.push(`?${params.toString()}`,{scroll : false});
+    startTransition(() => {
+      setOptimistic(value);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(key, value);
+      router.push(`?${params.toString()}`, { scroll: false });
+    });
   };
 
-  const handlePriceRange = (value : number[]) => {
-    setPriceRange(() => (value))
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("maxPrice", value.toString());
-    router.push(`?${params.toString()}`,{scroll : false});
-  }
+
 
   return (
     <div className="w-64 p-6 font-sans">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-1">Premium Audio</h2>
-        <p className="text-sm text-gray-500">
-          Discover studio-grade sound with our speakers.
-        </p>
-      </div>
-
       {/* Categories Section */}
       <div className="mb-8">
         <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
@@ -79,21 +66,24 @@ export default function Filters({
           Price Range
         </h3>
         <div className="relative">
-          <Slider 
-          max={maxPrice}
-          step={5}
-          onValueChange={handlePriceRange}
-          value={priceRange}
-          className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-500"
+          <Slider
+            max={maxPrice}
+            step={5}
+            onValueChange={(value) => setPriceRange(value)}
+            onValueCommit={(value) => {
+              const params = new URLSearchParams(searchParams.toString());
+              params.set("maxPrice", value.toString());
+              router.push(`?${params.toString()}`, { scroll: false });
+            }}
+            value={priceRange}
+            className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-500"
             style={{
               background: `linear-gradient(to right, #14b8a6 0%, #14b8a6 ${(maxPrice / maxPrice) * 100}%, #e5e7eb ${(maxPrice / maxPrice) * 100}%, #e5e7eb 100%)`,
             }}
           />
         </div>
         <div className="flex items-center justify-between mt-3">
-          <span className="text-sm font-medium text-gray-700">
-            ${0}
-          </span>
+          <span className="text-sm font-medium text-gray-700">${0}</span>
           <span className="text-sm font-medium text-gray-700">
             ${maxPrice || 0}
           </span>
@@ -113,7 +103,7 @@ export default function Filters({
                   <label className="flex items-center cursor-pointer group">
                     <input
                       type="checkbox"
-                      checked={m.name === manufacturer}
+                      checked={m.name === optimistic}
                       onChange={() => handleMnu("manufacturer", m.name)}
                       className="w-4 h-4 text-teal-500 border-gray-300 rounded focus:ring-teal-500 focus:ring-2"
                     />

@@ -19,11 +19,8 @@ const CategoryProductPage = async ({
   const categoryProductsData = productServices.getProducts({
     category : slug,
     maxPrice,
-    // manufacturer
+    manufacturer
   });
-
-  
-
 
   const manufacturerData = manufacturerServices.getManufacturer();
 
@@ -36,7 +33,7 @@ const CategoryProductPage = async ({
 
   return (
     <div className="p-8 bg-gray-50 flex">
-      <Filters categories={categories.data} manufacturers={manufacturers.data} products={categoryProducts.data.data} maxPrice={categoryProducts.data.max_price}/>
+      <Filters categories={categories.data} manufacturers={manufacturers.data} maxPrice={categoryProducts.data.max_price}/>
       <div className="grid grid-cols-3 gap-5">
         {
           categoryProducts?.data?.data?.length > 0 &&
