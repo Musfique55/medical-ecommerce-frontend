@@ -1,8 +1,9 @@
-import { orderServices } from "@/services/orders/orders.services";
-import { Heart, MapPin, Package, ShoppingBag } from "lucide-react";
 
-const CustomerStats = async () => {
-  const orders = await orderServices.getCustomerOrders();
+import { Order } from "@/types";
+import { Heart, MapPin, ShoppingBag } from "lucide-react";
+
+const CustomerStats = async ({orders} : {orders : Order[]}) => {
+  
   return (
     <div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -13,7 +14,7 @@ const CustomerStats = async () => {
                 Total Orders
               </p>
               <p className="text-3xl sm:text-4xl font-bold text-gray-900">
-                {orders?.data?.length || 0}
+                {orders?.length || 0}
               </p>
             </div>
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-teal-50 rounded-xl flex items-center justify-center">

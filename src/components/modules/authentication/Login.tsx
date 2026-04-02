@@ -51,8 +51,9 @@ export function LoginForm({
           password: value.password,
           callbackURL: "http://localhost:3000/checkout",
         });
-        if (error?.message) {
-          toast.error(error.message, { id: toastId });
+
+        if (error?.statusText) {
+          toast.error(error.statusText, { id: toastId });
           return;
         }
 

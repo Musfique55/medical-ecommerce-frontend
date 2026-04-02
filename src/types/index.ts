@@ -102,6 +102,7 @@ export interface OrderPayload {
 export interface Order {
   id: string;
   order_number: string;
+  order_status : string;
   subtotal: number;
   total_amount: number;
   order_items: OrderItem[];
@@ -135,3 +136,12 @@ export enum discountType {
   PERCENTAGE,
   FIXED,
 }
+
+// export enum orderStatus {
+//    "PENDING",
+//   "CONFIRMED",
+//   "SHIPPED",
+//   "DELIVERED",
+//   "CANCELLED",
+//   "RETURNED"
+// }

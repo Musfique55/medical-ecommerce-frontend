@@ -7,8 +7,21 @@ import {
 import CustomerStats from "@/components/modules/dashboard/customer/CustomerStats";
 import CustomerOrderHistory from "@/components/modules/dashboard/customer/CustomerOrderHistory";
 import ProfileCard from "@/components/modules/dashboard/customer/ProfileCard";
+import ActiveShipping from "@/components/modules/dashboard/customer/ActiveShipping";
+import { orderServices } from "@/services/orders/orders.services";
 
-export default function CustomerDashboard() {
+export default async function CustomerDashboard() {
+
+  const activeOrderData = orderServices.getActiveShippedOrders();
+  const allOrdersData = orderServices.getCustomerOrders();
+  const deliveredOrdersData = orderServices.getDeliveredOrders();
+
+  const [allOrders,deliveredOrders,activeOrders] = await Promise.all([
+    allOrdersData,
+    deliveredOrdersData,
+    activeOrderData,
+  ]);
+
   return (
     <div className="flex min-h-screen bg-white font-sans">
       {/* Main Content */}
@@ -19,12 +32,13 @@ export default function CustomerDashboard() {
             {/* Left Column - 2/3 width on desktop */}
             <div className="xl:col-span-2 space-y-4 sm:space-y-6">
               {/* Active Shipment Card */}
+              <ActiveShipping activeOrder={activeOrders.data}/>
 
               {/* Stats Cards */}
-              <CustomerStats />
+              <CustomerStats orders={allOrders.data}/>
 
               {/* Order History */}
-              <CustomerOrderHistory />
+              <CustomerOrderHistory orders={deliveredOrders.data}/>
             </div>
 
             {/* Right Column - 1/3 width on desktop */}

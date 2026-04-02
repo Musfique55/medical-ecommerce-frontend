@@ -1,10 +1,9 @@
-import { orderServices } from "@/services/orders/orders.services";
+
 import { Order } from "@/types";
 import { Package } from "lucide-react";
 import Link from "next/link";
 
-const CustomerOrderHistory = async () => {
-  const orders = await orderServices.getDeliveredOrders();
+const CustomerOrderHistory = ({orders} : {orders : Order[]}) => {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6">
@@ -21,8 +20,8 @@ const CustomerOrderHistory = async () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Order 1 */}
-        {orders.data.length > 0 &&
-          orders.data.slice(0, 2).map((item: Order) => (
+        {orders.length > 0 &&
+          orders.slice(0, 2).map((item: Order) => (
             <div
               key={item.id}
               className="border border-gray-200 rounded-xl p-4 hover:border-teal-200 transition-colors"
