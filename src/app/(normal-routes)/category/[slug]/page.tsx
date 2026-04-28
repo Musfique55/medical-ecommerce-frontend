@@ -1,6 +1,6 @@
 import Filters from "@/components/modules/category-products/filter";
 import { ProductCard } from "@/components/modules/layout/ProductCard";
-import { categoryServices } from "@/services/categories/categories.services";
+// import { categoryServices } from "@/services/categories/categories.services";
 import { manufacturerServices } from "@/services/manufacturer/manufacturer.services";
 import { productServices } from "@/services/products/products.services";
 import { Product } from "@/types";
@@ -15,7 +15,7 @@ const CategoryProductPage = async ({
   const { slug } = await params; 
   const {maxPrice,manufacturer} = await searchParams;
 
-  const categoryData = categoryServices.getCategories();
+  // const categoryData = categoryServices.getCategories();
   const categoryProductsData = productServices.getProducts({
     category : slug,
     maxPrice,
@@ -24,8 +24,8 @@ const CategoryProductPage = async ({
 
   const manufacturerData = manufacturerServices.getManufacturer();
 
-  const [categories, categoryProducts,manufacturers] = await Promise.all([
-    categoryData,
+  const [ categoryProducts,manufacturers] = await Promise.all([
+    // categoryData,
     categoryProductsData,
     manufacturerData
   ]);
@@ -33,7 +33,7 @@ const CategoryProductPage = async ({
 
   return (
     <div className="p-8 bg-gray-50 flex">
-      <Filters categories={categories.data} manufacturers={manufacturers.data} maxPrice={categoryProducts.data.max_price}/>
+      {/* <Filters categories={categories.data} manufacturers={manufacturers.data} maxPrice={categoryProducts.data.max_price}/> */}
       <div className="grid grid-cols-3 gap-5">
         {
           categoryProducts?.data?.data?.length > 0 &&

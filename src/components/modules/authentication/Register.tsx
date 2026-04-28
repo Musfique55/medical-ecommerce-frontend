@@ -13,9 +13,10 @@ import { Label } from "@/components/ui/label";
 import * as z from "zod";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
-import { authClient } from "@/lib/authClient";
 import { FieldError } from "@/components/ui/field";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { register } from "@/services/auth/auth.services";
 
 const schema = z.object({
   fullName: z.string().min(5, "name should have at least 5 characters"),
@@ -33,7 +34,7 @@ const schema = z.object({
 export function Register() {
 
   const [showPassword, setShowPassword] = useState(false);
-
+  const router = useRouter();
 
   const form = useForm({
     defaultValues: {
@@ -46,19 +47,25 @@ export function Register() {
     onSubmit: async ({ value }) => {
       const toastId = toast.loading("Please wait signing up...");
       try {
-        const { data, error } = await authClient.signUp.email({
-          email: value.email,
-          password: value.password,
-          name: value.fullName,
-          phone: value.phone,
-          //   callbackURL: "http://localhost:3000/checkout",
+        const {fullName,...rest} = value;
+        const res = await register({
+          ...rest,
+          name : value.fullName
         });
-        if (error?.message) {
-          toast.error(error.message, { id: toastId });
+      
+        if (res?.success === false) {
+          toast.error(res?.error, { id: toastId });
           return;
         }
 
-        toast.success("successfully signed up", { id: toastId });
+
+        if(res?.data?.user?.emailVerified === false){
+          router.push(`/auth/verify-pin?email=${res.data.user.email}`)
+        }else{
+          router.push("/");
+        }
+
+        toast.success("user registered successfully", { id: toastId });
       } catch (error) {
         toast.error("something went wrong", { id: toastId });
       }
@@ -128,7 +135,7 @@ export function Register() {
                 return (
                   <div>
                     <Label
-                      htmlFor="email"
+                      htmlFor="phone"
                       className="text-base font-semibold text-gray-900 mb-2"
                     >
                       Phone
@@ -195,7 +202,7 @@ export function Register() {
                 return (
                   <div>
                     <Label
-                      htmlFor="email"
+                      htmlFor="password"
                       className="text-base font-semibold text-gray-900 mb-2"
                     >
                       Password

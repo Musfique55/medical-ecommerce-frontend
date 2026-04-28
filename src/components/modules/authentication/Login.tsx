@@ -15,12 +15,15 @@ import { authClient } from "@/lib/authClient";
 import Link from "next/link";
 import { AlertCircle, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
+import { login } from "@/services/auth/auth.services";
+import { useRouter } from "next/navigation";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const handleGoogleLogin = async () => {
     await authClient.signIn.social({
@@ -46,18 +49,18 @@ export function LoginForm({
     onSubmit: async ({ value }) => {
       const toastId = toast.loading("Please wait signing in...");
       try {
-        const { data, error } = await authClient.signIn.email({
-          email: value.email,
-          password: value.password,
-          callbackURL: "http://localhost:3000/checkout",
-        });
+        const {data, success,message } = await login(value.email, value.password)
 
-        if (error?.statusText) {
-          toast.error(error.statusText, { id: toastId });
+        if (!success) {
+          toast.error(message, { id: toastId });
           return;
         }
-
-        toast.success("successfully signed in", { id: toastId });
+        if(!data.emailVerified){
+          router.push('/auth/verify-pin')
+        }
+        
+        router.push('/');
+        toast.success(message, { id: toastId });
       } catch (error) {
         toast.error("something went wrong", { id: toastId });
       }
@@ -224,7 +227,7 @@ export function LoginForm({
           <p className="text-gray-600">
             Don't have an account?{" "}
             <Link
-              href={"/register"}
+              href={"/auth/register"}
               className="text-blue-600 hover:text-blue-700 font-semibold"
             >
               Sign up

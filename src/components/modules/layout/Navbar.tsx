@@ -18,7 +18,7 @@ const Navbar = ({ categoryPromise }: {categoryPromise : Promise<{data : Category
                 All Categories
               </Link>
             </li>
-            {categories?.data &&
+            {categories?.data && categories.data.length > 0 &&
               categories.data.map((item) => (
                 <li key={item.id}>
                   <Link

@@ -1,7 +1,7 @@
 
 import  { Suspense } from "react";
 import Navbar from "../Navbar";
-import { categoryServices } from "@/services/categories/categories.services";
+// import { categoryServices } from "@/services/categories/categories.services";
 import { Button } from "../../../ui/button";
 import { Phone, Search } from "lucide-react";
 import { Input } from "../../../ui/input";
@@ -12,7 +12,8 @@ import SearchBar from "./SearchBar";
 
 
 const Header = () => {
-  const categoryPromise = categoryServices.getCategories();
+  // const categoryPromise = categoryServices.getCategories();
+  // console.log(categoryPromise);
   return (
     <div>
       <header className="bg-white border-b sticky top-0 z-50">
@@ -80,7 +81,7 @@ const Header = () => {
         </div>
       </header>
       <Suspense>
-        <Navbar categoryPromise={categoryPromise} />
+        {/* <Navbar categoryPromise={categoryPromise} /> */}
       </Suspense>
     </div>
   );
