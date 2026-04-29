@@ -1,11 +1,11 @@
 import CheckoutSteps from "@/components/modules/checkout/CheckoutSteps";
 import { Footer } from "@/components/modules/layout/Footer";
-import Header from "@/components/modules/layout/header/Header";
+// import Header from "@/components/modules/layout/header/Header";
 
 const CheckoutLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div>
-      <Header />
+      {/* <Header /> */}
       <CheckoutSteps />
       {children}
       <Footer />

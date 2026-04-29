@@ -3,10 +3,10 @@ import ProductInfo from "@/components/modules/product-details/ProductInfo";
 import { productServices } from "@/services/products/products.services";
 import { Product } from "@/types";
 
-export const generateStaticParams = async () => {
-  const { data } = await productServices.getProducts();
-  return data.data.map((product: Product) => ({ id: product.id })).splice(0, 3);
-};
+// export const generateStaticParams = async () => {
+//   const { data } = await productServices.getProducts();
+//   return data.data.map((product: Product) => ({ id: product.id })).splice(0, 3);
+// };
 
 const ProductDetails = async ({
   params,

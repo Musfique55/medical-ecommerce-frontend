@@ -1,18 +1,18 @@
 
 import  { Suspense } from "react";
 import Navbar from "../Navbar";
-// import { categoryServices } from "@/services/categories/categories.services";
 import { Button } from "../../../ui/button";
 import { Phone, Search } from "lucide-react";
 import { Input } from "../../../ui/input";
 import Link from "next/link";
 import Actions from "./Actions";
 import SearchBar from "./SearchBar";
+import { getCategories } from "@/services/categories/categories.services";
 
 
 
 const Header = () => {
-  // const categoryPromise = categoryServices.getCategories();
+  const categoryPromise = getCategories();
   // console.log(categoryPromise);
   return (
     <div>
@@ -81,7 +81,7 @@ const Header = () => {
         </div>
       </header>
       <Suspense>
-        {/* <Navbar categoryPromise={categoryPromise} /> */}
+        <Navbar categoryPromise={categoryPromise} />
       </Suspense>
     </div>
   );

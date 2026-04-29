@@ -1,3 +1,4 @@
+"use server";
 import { env } from "../../../env";
 
 interface Params {
@@ -12,46 +13,44 @@ interface Options {
   revalidate?: number;
 }
 
-export const productServices = {
-  getProducts: async (params?: Params, options?: Options) => {
-    try {
-      const url = new URL(`${env.API_URL}/medicines`);
-      if (params) {
-        Object.entries(params).forEach(([key, value]) => {
-          if (value !== undefined || value !== "" || value !== null) {
-            url.searchParams.append(key, value);
-          }
-        });
-      }
-
-      const config: RequestInit = {};
-
-      if (options?.cache) {
-        config.cache = options.cache;
-      }
-
-      if (options?.revalidate) {
-        config.next = { revalidate: options.revalidate };
-      }
-
-      const res = await fetch(url.toString(), config);
-      const data = await res.json();
-
-      return { data: data, error: null };
-    } catch (error) {
-      console.log(error);
-      return { data: null, error: error };
+export const getProducts = async (params?: Params, options?: Options) => {
+  try {
+    const url = new URL(`${env.API_URL}/medicines`);
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined || value !== "" || value !== null) {
+          url.searchParams.append(key, value);
+        }
+      });
     }
-  },
 
-  getProduct: async (id: string) => {
-    try {
-      const res = await fetch(`${env.API_URL}/medicines/${id}`);
-      const data = await res.json();
+    const config: RequestInit = {};
 
-      return { data: data.data, error: null };
-    } catch (error) {
-      return { data: null, error };
+    if (options?.cache) {
+      config.cache = options.cache;
     }
-  },
+
+    if (options?.revalidate) {
+      config.next = { revalidate: options.revalidate };
+    }
+
+    const res = await fetch(url.toString(), config);
+    const data = await res.json();
+
+    return { data: data, error: null };
+  } catch (error) {
+    console.log(error);
+    return { data: null, error: error };
+  }
+};
+
+export const getProduct = async (id: string) => {
+  try {
+    const res = await fetch(`${env.API_URL}/medicines/${id}`);
+    const data = await res.json();
+
+    return { data: data.data, error: null };
+  } catch (error) {
+    return { data: null, error };
+  }
 };

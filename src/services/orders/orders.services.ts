@@ -1,14 +1,27 @@
 import { cookies } from "next/headers"
 import { env } from "../../../env"
+import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
+
+async function getCookieData() : Promise<ReadonlyRequestCookies> {
+  return new Promise((resolve) =>
+    setTimeout(async () => {
+      // cookies will be called outside of the async context, causing a build-time error
+      const cookieStore = await cookies()
+      resolve(cookieStore)
+    }, 1000)
+  )
+}
+
+
 
 export const orderServices = {
     getCustomerOrders : async () => {
         try {
-            const cookieStore = await cookies();
+            const cookieData = await getCookieData();
             const res = await fetch(`${env.API_URL}/orders`,{
                 headers : {
                     "content-type" : "application/json",
-                    Cookie : cookieStore.toString()
+                    Cookie : cookieData.toString()
                 }
             });
             const data = await res.json();
@@ -20,11 +33,11 @@ export const orderServices = {
     },
     getDeliveredOrders : async () => {
         try {
-            const cookieStore = await cookies();
+            const cookieData = await getCookieData();
             const res = await fetch(`${env.API_URL}/orders/delivered`,{
                 headers : {
                     "content-type" : "application/json",
-                    Cookie : cookieStore.toString()
+                    Cookie : cookieData.toString()
                 }
             });
             const data = await res.json();
@@ -36,11 +49,11 @@ export const orderServices = {
     },
     getActiveShippedOrders : async () => {
         try {
-            const cookieStore = await cookies();
+            const cookieData = await getCookieData();
             const res = await fetch(`${env.API_URL}/orders/active-shipped`,{
                 headers : {
                     "content-type" : "application/json",
-                    Cookie : cookieStore.toString()
+                    Cookie : cookieData.toString()
                 }
             });
             const data = await res.json();

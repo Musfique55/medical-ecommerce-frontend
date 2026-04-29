@@ -3,7 +3,11 @@ import { Category } from "@/types";
 import Link from "next/link";
 import { use } from "react";
 
-const Navbar = ({ categoryPromise }: {categoryPromise : Promise<{data : Category[]}>}) => {
+const Navbar = ({
+  categoryPromise,
+}: {
+  categoryPromise: Promise<{ data: Category[] }>;
+}) => {
   const categories = use(categoryPromise);
   return (
     <div>
@@ -18,7 +22,8 @@ const Navbar = ({ categoryPromise }: {categoryPromise : Promise<{data : Category
                 All Categories
               </Link>
             </li>
-            {categories?.data && categories.data.length > 0 &&
+            {categories?.data &&
+              categories.data.length > 0 &&
               categories.data.map((item) => (
                 <li key={item.id}>
                   <Link

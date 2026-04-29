@@ -1,61 +1,122 @@
 import { NextRequest, NextResponse } from "next/server";
-import { userServices } from "./services/user/user.services";
-import { Roles } from "./constants/roles";
+import { jwtUtils } from "./utils/jwtUtils";
+import {
+  getDefaultRoute,
+  isAuthRoute,
+  Roles,
+  routesOwner,
+} from "./utils/authUtils";
+import { Roles as userRoles } from "./constants/roles";
+import { isExpiringSoon } from "./utils/tokenUtils";
+import { newRefreshToken } from "./services/auth/auth.services";
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const accessToken = request.cookies.get("accessToken")?.value;
+  const refreshToken = request.cookies.get("refreshToken")?.value;
+  let user = null;
+  let isValidToken = false;
+  const isAuth = isAuthRoute(pathname);
 
-  let isAdmin = false;
-  let isSeller = false;
-  let isCustomer = false;
-  let isAuthenticated = false;
-
-  const { data } = await userServices.getSession();
-  if (data) {
-    isAuthenticated = true;
-    if (data.user.role === Roles.ADMIN) {
-      isAdmin = true;
-    }
-
-    if (data.user.role === Roles.SELLER) {
-      isSeller = true;
-    }
-
-    if (data.user.role === Roles.CUSTOMER) {
-      isCustomer = true;
+  if (accessToken) {
+    isValidToken = jwtUtils.verifyToken(accessToken);
+    user = jwtUtils.decodeToken(accessToken);
+  } else {
+    if (!isValidToken && refreshToken) {
+      user = jwtUtils.decodeToken(refreshToken);
     }
   }
 
-  if (!isAuthenticated) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  // proactively refresh token
+  if (
+    (!isValidToken && refreshToken) ||
+    (accessToken && (await isExpiringSoon(accessToken)))
+  ) {
+    try {
+      const refreshed = await newRefreshToken();
+      if(refreshed.success){
+        const response = NextResponse.next();
+        response.headers.set("x-token-refreshed","1");
+        response.cookies.set({
+          name : "accessToken",
+          value : refreshed.data.accessToken,
+          sameSite : "none",
+          httpOnly : true,
+          path : "/",
+          secure : true
+        })
+        response.cookies.set({
+          name : "refreshToken",
+          value : refreshed.data.refreshToken,
+          sameSite : "none",
+          httpOnly : true,
+          path : "/",
+          secure : true
+        })
+        response.cookies.set({
+          name : "better-auth.session_token",
+          value : refreshed.data.token,
+          sameSite : "none",
+          httpOnly : true,
+          path : "/",
+          secure : true
+        })
+      }
+    } catch (error) {
+      console.log("error on refreshing token",error);
+    }
+  }
+  if ((isValidToken || refreshToken) && isAuth) {
+    return NextResponse.redirect(
+      new URL(getDefaultRoute(user!.role as Roles), request.url),
+    );
   }
 
-  const role = data.user.role;
-
-  if (pathname === "/dashboard") {
-    if (role === Roles.CUSTOMER)
-      return NextResponse.redirect(new URL("/dashboard/customer", request.url));
-    if (role === Roles.SELLER)
-      return NextResponse.redirect(new URL("/dashboard/seller", request.url));
-    if (role === Roles.ADMIN)
-      return NextResponse.redirect(new URL("/dashboard/admin", request.url));
+  if (routesOwner(pathname) !== null && !isValidToken && !refreshToken) {
+    const url = new URL("/auth/login", request.url);
+    url.searchParams.append("redirect", pathname);
+    return NextResponse.redirect(url);
   }
 
-  if (isAdmin && !pathname.startsWith("/dashboard/admin")) {
-    return NextResponse.redirect(new URL("/dashboard/admin", request.url));
-  }
+  if (user) {
+    if (user.emailVerified === false) {
+      return NextResponse.redirect(new URL("/auth/verify-pin", request.url));
+    }
 
-  if (isSeller && !pathname.startsWith("/dashboard/seller")) {
-    return NextResponse.redirect(new URL("/dashboard/seller", request.url));
-  }
+    if (routesOwner(pathname) === "ADMIN" && user.role !== userRoles.ADMIN) {
+      return NextResponse.redirect(
+        new URL(getDefaultRoute(user.role as Roles), request.url),
+      );
+    }
 
-  if (isCustomer && !pathname.startsWith("/dashboard/customer")) {
-    return NextResponse.redirect(new URL("/dashboard/customer", request.url));
+    if (
+      routesOwner(pathname) === "CUSTOMER" &&
+      user.role !== userRoles.CUSTOMER
+    ) {
+      return NextResponse.redirect(
+        new URL(getDefaultRoute(user.role as Roles), request.url),
+      );
+    }
+
+    if (routesOwner(pathname) === "SELLER" && user.role !== userRoles.SELLER) {
+      return NextResponse.redirect(
+        new URL(getDefaultRoute(user.role as Roles), request.url),
+      );
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/checkout", "/dashboard", "/dashboard/:path*"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (unless you want to proxy API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
 };
