@@ -44,9 +44,9 @@ export const getProducts = async (params?: Params, options?: Options) => {
   }
 };
 
-export const getProduct = async (id: string) => {
+export const getProduct = async (slug: string) => {
   try {
-    const res = await fetch(`${env.API_URL}/medicines/${id}`);
+    const res = await fetch(`${env.API_URL}/medicines/${slug}`);
     const data = await res.json();
 
     return { data: data.data, error: null };

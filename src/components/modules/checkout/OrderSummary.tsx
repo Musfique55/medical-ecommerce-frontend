@@ -1,18 +1,18 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import useCartSnapshot from "@/hooks/useCartSnapshot";
-import useSteps from "@/hooks/useSteps";
 import { cartItem } from "@/types";
 import { CheckCircle2, Shield, Truck } from "lucide-react";
 
 const OrderSummary = () => {
-  const cartSnapShot = useCartSnapshot();
-  const items: cartItem[] = JSON.parse(cartSnapShot.getCartItemsSnapshot);
+  const { data: items } = useCartSnapshot();
 
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
+  const subtotal = items?.data?.items
+    ? items.data.items.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      )
+    : 0;
   const shipping = subtotal > 50 ? 0 : 5.99;
   const tax = subtotal * 0.08;
   const codFee = 2.99; // Cash on delivery fee
@@ -25,7 +25,7 @@ const OrderSummary = () => {
 
         {/* Products */}
         <div className="space-y-4 mb-6 pb-6 border-b border-blue-100">
-          {items.map((item) => (
+          {items?.data?.items?.map((item) => (
             <div key={item.id} className="flex gap-4">
               <div className="relative">
                 <div className="size-20 bg-gradient-to-br from-blue-50 to-sky-50 rounded-xl overflow-hidden">

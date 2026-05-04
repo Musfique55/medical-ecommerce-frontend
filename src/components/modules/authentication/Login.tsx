@@ -1,11 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
 import { useForm } from "@tanstack/react-form";
@@ -13,17 +8,17 @@ import * as z from "zod";
 import { toast } from "sonner";
 import { authClient } from "@/lib/authClient";
 import Link from "next/link";
-import { AlertCircle, Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, LoaderCircle, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { login } from "@/services/auth/auth.services";
 import { useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { env } from "../../../../env";
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export function LoginForm({ redirect }: { redirect: string }) {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const handleGoogleLogin = async () => {
     await authClient.signIn.social({
@@ -31,6 +26,28 @@ export function LoginForm({
       callbackURL: "http://localhost:3000",
     });
   };
+
+  const { mutate: loginMutation, isPending } = useMutation({
+    mutationFn: async (value: { email: string; password: string }) => {
+      const res = await login(value.email, value.password);
+      return res;
+    },
+    onSuccess: async (data) => {
+      toast.success(data?.message);
+      await queryClient.invalidateQueries({
+        queryKey: ["auth"],
+      });
+      if (redirect) {
+        router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/${redirect}`);
+      } else {
+        router.push("/");
+      }
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error(error?.message);
+    },
+  });
 
   const formSchema = z.object({
     email: z.string().nonempty("this field is required"),
@@ -47,23 +64,7 @@ export function LoginForm({
     },
     validators: { onSubmit: formSchema },
     onSubmit: async ({ value }) => {
-      const toastId = toast.loading("Please wait signing in...");
-      try {
-        const {data, success,message } = await login(value.email, value.password)
-
-        if (!success) {
-          toast.error(message, { id: toastId });
-          return;
-        }
-        if(!data.emailVerified){
-          router.push('/auth/verify-pin')
-        }
-        
-        router.push('/');
-        toast.success(message, { id: toastId });
-      } catch (error) {
-        toast.error("something went wrong", { id: toastId });
-      }
+      loginMutation(value);
     },
   });
 
@@ -174,10 +175,18 @@ export function LoginForm({
 
             {/* Submit Button */}
             <Button
+              disabled={isPending}
               type="submit"
               className="w-full bg-blue-600 hover:bg-blue-700 h-14 text-base font-semibold rounded-xl shadow-lg shadow-blue-200 hover:shadow-xl transition-all cursor-pointer"
             >
-              Sign In
+              {isPending ? (
+                <span className="flex items-center gap-3">
+                  <LoaderCircle className="animate-spin transition-all" />{" "}
+                  Signing in...
+                </span>
+              ) : (
+                "Sign In"
+              )}
             </Button>
           </form>
 

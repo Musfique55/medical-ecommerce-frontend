@@ -1,15 +1,8 @@
-
-import { ArrowLeft} from "lucide-react";
-
-
+import { ArrowLeft } from "lucide-react";
 import CartItems from "@/components/modules/cart/CartItems";
 import Link from "next/link";
 
-
-
 export default function CartPage() {
-  
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50/30 to-white">
       {/* Header */}
@@ -24,12 +17,8 @@ export default function CartPage() {
           </Link>
         </div>
       </div>
-
       <div className="container mx-auto px-6 py-12 lg:py-16">
-        
-          <CartItems />
-
-        
+        <CartItems />
       </div>
     </div>
   );

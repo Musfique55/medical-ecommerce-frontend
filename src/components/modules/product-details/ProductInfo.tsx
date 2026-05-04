@@ -22,12 +22,12 @@ const ProductInfo = ({ product }: { product: Product }) => {
         {/* Image Gallery */}
         <div className="space-y-4">
           <div className="relative bg-gradient-to-br from-blue-50 to-sky-50 rounded-3xl overflow-hidden aspect-square border border-blue-100">
-            <Image
+            {/* <Image
               src={product?.image_url?.[0]}
               alt={product?.name || "fallback"}
               fill
               className="w-full h-full object-cover"
-            />
+            /> */}
             {product?.discount_value > 0 && (
               <Badge className="absolute top-6 left-6 bg-red-500 hover:bg-red-600 text-white rounded-xl px-4 py-2 text-base font-semibold shadow-lg">
                 Save {product?.discount_value}%

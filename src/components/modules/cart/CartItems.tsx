@@ -1,7 +1,6 @@
 "use client";
-import { cartServices } from "@/services/cart/cart.services";
-import { cartItem } from "@/types";
 import { useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import {
   Trash2,
@@ -17,16 +16,19 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import useCartSnapshot from "@/hooks/useCartSnapshot";
-
-
+import {
+  removeProductFromCart,
+  updateQuantityFromCart,
+} from "@/services/cart/cart.services";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const CartItems = () => {
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
 
-  const getCartSnapshot = useCartSnapshot();
-
-  const items: cartItem[] = JSON.parse(getCartSnapshot.getCartItemsSnapshot);
+  const { data: items } = useCartSnapshot();
+  const queryClient = useQueryClient();
 
   const handleApplyPromo = () => {
     if (promoCode.toLowerCase() === "health10") {
@@ -34,22 +36,68 @@ const CartItems = () => {
     }
   };
 
-  const handleUpdateQuantity = (id: string, quantity: number) => {
-    cartServices.updateQuantity(id, quantity);
-  };
-
-  const handleRemove = (id: string) => {
-    cartServices.removeFromCart(id);
-  };
-
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
+  const debouncedUpdateAPI = useDebouncedCallback(
+    async (id: string, quantity: number) => {
+      const res = await updateQuantityFromCart(id, quantity);
+      if (!res.success) {
+        toast.error(res.message);
+      } else {
+        toast.success(res.message);
+      }
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    500
   );
+
+  const handleUpdateQuantity = (id: string, quantity: number) => {
+    queryClient.setQueryData(["cart"], (oldData: any) => {
+      if (!oldData?.data?.items) return oldData;
+      return {
+        ...oldData,
+        data: {
+          ...oldData.data,
+          items: oldData.data.items.map((item: any) =>
+            item.productId === id ? { ...item, quantity } : item,
+          ),
+        },
+      };
+    });
+    
+    debouncedUpdateAPI(id, quantity);
+  };
+
+  const handleRemove = async (id: string) => {
+    queryClient.setQueryData(["cart"], (oldData: any) => {
+      if (!oldData?.data?.items) return oldData;
+      return {
+        ...oldData,
+        data: {
+          ...oldData.data,
+          items: oldData.data.items.filter(
+            (item: any) => item.productId !== id,
+          ),
+        },
+      };
+    });
+    const res = await removeProductFromCart(id);
+    if (!res.success) {
+      toast.error(res.message);
+    }
+    toast.success(res.message);
+    queryClient.invalidateQueries({ queryKey: ["cart"] });
+  };
+
+  const subtotal = items?.data?.items
+    ? items?.data?.items.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      )
+    : 0;
   const shipping = subtotal > 50 ? 0 : 5.99;
   const discount = promoApplied ? subtotal * 0.1 : 0; // 10% discount when promo applied
   const tax = (subtotal - discount) * 0.08; // 8% tax
   const total = subtotal + shipping - discount + tax;
+  console.log(items);
 
   return (
     <div>
@@ -58,11 +106,12 @@ const CartItems = () => {
           Shopping Cart
         </h1>
         <p className="text-lg text-gray-600">
-          {items.length} {items.length === 1 ? "item" : "items"} in your cart
+          {items?.data?.items.length}{" "}
+          {items?.data?.items.length === 1 ? "item" : "items"} in your cart
         </p>
       </div>
 
-      {items.length === 0 ? (
+      {items?.data?.items.length === 0 ? (
         // Empty Cart State
         <div className="text-center py-20">
           <div className="bg-blue-50 size-32 rounded-full flex items-center justify-center mx-auto mb-8">
@@ -84,7 +133,7 @@ const CartItems = () => {
         <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-6">
-            {items.map((item) => (
+            {items?.data?.items.map((item) => (
               <div
                 key={item.id}
                 className="bg-white rounded-3xl p-6 lg:p-8 border border-blue-100 hover:shadow-lg hover:shadow-blue-100/50 transition-all"
@@ -104,13 +153,13 @@ const CartItems = () => {
                   <div className="md:col-span-2 space-y-3">
                     <div>
                       <div className="text-xs text-blue-600 font-semibold mb-1 uppercase tracking-wide">
-                        {item.category}
+                        {/* {item.category} */}
                       </div>
                       <h3 className="text-xl font-bold text-gray-900 mb-2 leading-snug">
                         {item.name}
                       </h3>
                       <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">
-                        {item.description}
+                        {/* {item.description} */}
                       </p>
                     </div>
 
@@ -121,7 +170,12 @@ const CartItems = () => {
                           size="icon"
                           variant="ghost"
                           className="size-9 rounded-xl hover:bg-white"
-                          onClick={() => handleUpdateQuantity(item.id, -1)}
+                          onClick={() =>
+                            handleUpdateQuantity(
+                              item.productId,
+                              item.quantity - 1,
+                            )
+                          }
                         >
                           <Minus className="size-4" />
                         </Button>
@@ -132,7 +186,12 @@ const CartItems = () => {
                           size="icon"
                           variant="ghost"
                           className="size-9 rounded-xl hover:bg-white"
-                          onClick={() => handleUpdateQuantity(item.id, 1)}
+                          onClick={() =>
+                            handleUpdateQuantity(
+                              item.productId,
+                              item.quantity + 1,
+                            )
+                          }
                         >
                           <Plus className="size-4" />
                         </Button>
@@ -142,7 +201,7 @@ const CartItems = () => {
                         size="icon"
                         variant="ghost"
                         className="size-9 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl ml-auto"
-                        onClick={() => handleRemove(item.id)}
+                        onClick={() => handleRemove(item.productId)}
                       >
                         <Trash2 className="size-4" />
                       </Button>
@@ -167,7 +226,12 @@ const CartItems = () => {
                           size="icon"
                           variant="ghost"
                           className="size-9 rounded-xl hover:bg-white"
-                          onClick={() => handleUpdateQuantity(item.id, -1)}
+                          onClick={() =>
+                            handleUpdateQuantity(
+                              item.productId,
+                              item.quantity - 1,
+                            )
+                          }
                         >
                           <Minus className="size-4" />
                         </Button>
@@ -178,7 +242,12 @@ const CartItems = () => {
                           size="icon"
                           variant="ghost"
                           className="size-9 rounded-xl hover:bg-white"
-                          onClick={() => handleUpdateQuantity(item.id, 1)}
+                          onClick={() =>
+                            handleUpdateQuantity(
+                              item.productId,
+                              item.quantity + 1,
+                            )
+                          }
                         >
                           <Plus className="size-4" />
                         </Button>
@@ -187,7 +256,7 @@ const CartItems = () => {
                       <Button
                         variant="ghost"
                         className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl text-sm"
-                        onClick={() => handleRemove(item.id)}
+                        onClick={() => handleRemove(item.productId)}
                       >
                         <Trash2 className="size-4 mr-1" />
                         Remove
@@ -255,7 +324,7 @@ const CartItems = () => {
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-base">
                   <span className="text-gray-600">
-                    Subtotal ({items.length} items)
+                    Subtotal ({items?.data?.items.length} items)
                   </span>
                   <span className="font-semibold text-gray-900">
                     ${subtotal.toFixed(2)}

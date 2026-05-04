@@ -1,27 +1,17 @@
-"use client"
+"use client";
 
-import { cartServices } from "@/services/cart/cart.services";
-import { useSyncExternalStore } from "react";
-
-const subscribe = (callback : () => void) => {
-    window.addEventListener("storage",callback);
-    return () => window.removeEventListener("storage",callback);
-}
-
-const itemsServerSnapshot = () => {
-    return "[]";
-}
-
-const totalItemsServerSnapshot = () => {
-    return 0;
-}
+import { getCartItems } from "@/services/cart/cart.services";
+import { cartItem } from "@/types";
+import { useQuery } from "@tanstack/react-query";
 
 const useCartSnapshot = () => {
-   const getCartItemsSnapshot = useSyncExternalStore(subscribe,cartServices.getCartItemsSnapshot,itemsServerSnapshot);
-
-   const getTotalItemsSnapshot = useSyncExternalStore(subscribe,cartServices.getCartSnapshot,totalItemsServerSnapshot);
-
-   return {getCartItemsSnapshot,getTotalItemsSnapshot}
+  return useQuery<{ data: cartItem }>({
+    queryKey: ["cart"],
+    queryFn: async () => {
+      const res = await getCartItems();
+      return res;
+    },
+  });
 };
 
 export default useCartSnapshot;

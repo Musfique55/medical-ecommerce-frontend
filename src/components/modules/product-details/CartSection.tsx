@@ -1,17 +1,34 @@
 "use client"
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { cartServices } from '@/services/cart/cart.services';
 import { Product } from '@/types';
 import { Heart, Minus, Plus, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
+import { addToCart } from '@/services/cart/cart.services';
+import { useQueryClient } from '@tanstack/react-query';
+
 
 const CartSection = ({product} : {product : Product}) => {
     const [quantity,setQuantity] = useState(1);
     const price   = product.discount_value > 0 ? Math.round(product.retails_price - ((product.retails_price * product.discount_value) / 100)).toFixed(2) : Number(product?.retails_price);
+    const queryClient = useQueryClient();
 
-    const handleCart = (product : Product,quantity:number,price:number) => {
-      cartServices.addToCart(product,quantity,price);
+    const handleCart = async(product : Product,quantity:number,price:number) => {
+     const res = await addToCart({
+        image : product.image_url?.[0] || null,
+        name : product.name,
+        price : price,
+        productId : product.id
+      },quantity);
+
+      if(!res.success){
+        toast.error(res.message);
+        return;
+      }
+
+      queryClient.invalidateQueries({
+        queryKey: ["cart"],
+      });
       toast.success("item added to the cart");
     }
     return (
@@ -58,7 +75,7 @@ const CartSection = ({product} : {product : Product}) => {
               <Button
                 size="lg"
                 className="flex-1 bg-blue-600 hover:bg-blue-700 h-16 text-lg font-semibold rounded-2xl shadow-lg shadow-blue-200 hover:shadow-xl transition-all"
-                onClick={() => handleCart(product,quantity,Number(price))}
+                onClick={async() => await handleCart(product,quantity,Number(price))}
                 disabled={product.stock === 0}
               >
                 <ShoppingCart className="size-6 mr-2" />

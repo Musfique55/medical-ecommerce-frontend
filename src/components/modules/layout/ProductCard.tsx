@@ -21,21 +21,18 @@ export function ProductCard({ product }: ProductCardProps) {
     (Number(product?.retails_price) - (Number(product?.retails_price) * product?.discount_value) / 100)
     : product?.retails_price;
 
-  const sanitizeUrl = (slug : string) => {
-    const url = slug.split(" ").join("-");
-    return url; 
-  }
+  
     
   return (
-    <Link href={`/products/${sanitizeUrl(product.name)}/${product.id}`} className="bg-white rounded-xl border hover:shadow-lg transition-shadow duration-300 overflow-hidden group max-h-[430px]">
+    <Link href={`/products/${product?.slug}`} className="bg-white rounded-xl border hover:shadow-lg transition-shadow duration-300 overflow-hidden group max-h-[430px]">
       <div className="relative overflow-hidden">
-        <Image
+        {/* <Image
           src={product.image_url[0]}
           alt={product.name}
           height={200}
           width={200}
           className="object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+        /> */}
         {product.discount_value > 0 && (
           <Badge className="absolute top-3 left-3 bg-red-500 hover:bg-red-600">
             {product.discount_value}% OFF

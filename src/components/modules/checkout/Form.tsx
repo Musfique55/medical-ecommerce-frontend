@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import useCartSnapshot from "@/hooks/useCartSnapshot";
 import useSteps from "@/hooks/useSteps";
-import { cartServices } from "@/services/cart/cart.services";
-import { cartItem } from "@/types";
+// import { cartServices } from "@/services/cart/cart.services";
+import { cartItem, OrderPayload } from "@/types";
 import { useForm } from "@tanstack/react-form";
 import { CheckCircle2, CreditCard, MapPin, Shield, User } from "lucide-react";
 import { toast } from "sonner";
@@ -26,19 +26,14 @@ const formSchema = z.object({
     .min(11, "phone number must be 11 digits")
     .max(11, "phone number must be 11 digits"),
   street_address: z.string().min(1, "this field is required"),
-  apartment: z.string().optional().default(""),
+  apartment: z.string(),
   city: z.string().min(1, "this field is required"),
   zip_code: z.string().min(4, "zip code must be 4 numbers"),
-  special_instruction: z.string().optional().default(""),
+  special_instruction: z.string(),
 });
 
 const Form = () => {
-  const cartSnapShot = useCartSnapshot();
-  const items: cartItem[] = JSON.parse(cartSnapShot.getCartItemsSnapshot);
-  const subTotal = items.reduce(
-    (sum, curr) => (sum += curr.price * curr.quantity),
-    0,
-  );
+  const { data: items } = useCartSnapshot();
 
   const updateStep = useSteps((state) => state.updateStep);
 
@@ -56,16 +51,14 @@ const Form = () => {
     },
     validators: { onSubmit: formSchema },
     onSubmit: async ({ value }) => {
-      const orderSchema = {
+      const orderSchema: OrderPayload = {
         customer_id: "zW9kXLeuVLLU8spcNCYZ83fF5F6ew9jD",
-        subtotal: subTotal,
-        total_amount: subTotal,
-        order_items: items.map((item) => ({
-          product_id: item.id,
+        order_items: (items?.data?.items || []).map((item: any) => ({
+          product_id: item.productId || item.id,
           quantity: item.quantity,
-          unit_price: item.price,
         })),
         delivery_method: "COD",
+        payment_status: "PENDING",
         shipping_address: {
           fullName: value.firstName + value.lastName,
           email: value.email,
@@ -79,9 +72,10 @@ const Form = () => {
       };
       const toastId = toast.loading("Order is placing...");
       try {
-        await placeOrder(orderSchema);
+        const res = await placeOrder(orderSchema);
+        console.log(res);
         toast.success("order placed successfully", { id: toastId });
-        cartServices.clearCart();
+        // cartServices.clearCart();
         updateStep(2);
       } catch (error: any) {
         toast.error(error.message || "something went wrong", { id: toastId });
@@ -298,8 +292,8 @@ const Form = () => {
                             className={`h-12 bg-blue-50/50 border-blue-200 rounded-xl text-base`}
                           />
                           {isInvalid && (
-                          <FieldError errors={field.state.meta.errors} />
-                        )}
+                            <FieldError errors={field.state.meta.errors} />
+                          )}
                         </Field>
                       );
                     }}

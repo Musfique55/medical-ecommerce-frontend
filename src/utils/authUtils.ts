@@ -51,6 +51,7 @@ export const routesOwner = (pathname : string) => {
 }
 
 export const getDefaultRoute = (role : Roles) => {
+    console.log(role);
     if(role === "ADMIN"){
         return '/admin/dashboard'
     }

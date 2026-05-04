@@ -31,16 +31,20 @@ export interface Product {
   stock: number;
   rating: number;
   reviews: Review[];
+  slug: string;
 }
 
 export interface cartItem {
   id: string;
-  name: string;
-  image_url: string[];
-  price: number;
-  quantity: number;
-  category: string;
-  description: string;
+  items: {
+    id: string;
+    productId: string;
+    quantity: number;
+    price: number;
+    cartId: string;
+    name: string;
+    image: string | null;
+  }[];
 }
 
 export interface Review {
@@ -68,7 +72,6 @@ export interface Step {
 export interface OrderItemPayload {
   product_id: string;
   quantity: number;
-  unit_price: number;
 }
 
 export interface OrderItem {
@@ -83,10 +86,9 @@ export interface OrderItem {
 
 export interface OrderPayload {
   customer_id: string;
-  subtotal: number;
-  total_amount: number;
   order_items: OrderItemPayload[];
-  delivery_method: string;
+  delivery_method: "COD" | "ONLINE";
+  payment_status: "PENDING" | "PAID";
   shipping_address: {
     fullName: string;
     email: string;
@@ -102,9 +104,8 @@ export interface OrderPayload {
 export interface Order {
   id: string;
   order_number: string;
-  order_status : string;
-  subtotal: number;
-  total_amount: number;
+  order_status: string;
+  payment_status: string;
   order_items: OrderItem[];
   delivery_method: string;
   shipping_address: {

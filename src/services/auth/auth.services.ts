@@ -2,6 +2,8 @@
 import { cookies } from "next/headers";
 import { env } from "../../../env";
 import { setToken } from "@/utils/tokenUtils";
+import { mergeCart } from "../cart/cart.services";
+import { deleteCookie } from "@/utils/cookieUtils";
 
 export interface RegisterPayload {
   name: string;
@@ -22,37 +24,31 @@ export const login = async (email: string, password: string) => {
     }),
   });
 
-  if (!res.ok) {
-    console.log(res);
-    return {
-      message: "Something went wrong",
-      data: null,
-      success: false,
-    };
-  }
-
   const data = await res.json();
-  if (!data.success) {
-    return {
-      message: data.message,
-      data: null,
-      success: false,
-    };
+
+  if (!data?.success) {
+    throw new Error(data?.message);
   }
 
-  await setToken("accessToken", data.data.accessToken, 60 * 15);
-  await setToken("refreshToken", data.data.refreshToken, 60 * 60 * 60 * 24 * 7);
+  await setToken("accessToken", data.data.accessToken, 60 * 15 * 1000);
+  await setToken(
+    "refreshToken",
+    data.data.refreshToken,
+    60 * 60 * 24 * 7 * 1000,
+  );
   await setToken(
     "better-auth.session_token",
     data.data.token,
-    60 * 60 * 60 * 24 * 7,
+    60 * 60 * 24 * 7 * 1000,
   );
 
-  return {
-    data: data.data,
-    success: data.success,
-    message: data.message,
-  };
+  const cart = await mergeCart();
+  if (cart?.success) {
+    await deleteCookie("cart_id");
+    await setToken("cart_id", data.data.user.id, 60 * 60 * 24 * 30 * 1000);
+  }
+
+  return data;
 };
 
 export const register = async (payload: RegisterPayload) => {
@@ -83,11 +79,11 @@ export const register = async (payload: RegisterPayload) => {
       };
     }
 
-    await setToken("accessToken", result.data.accessToken, 60 * 15);
+    await setToken("accessToken", result.data.accessToken, 60 * 15 * 1000);
     await setToken(
       "refreshToken",
       result.data.refreshToken,
-      60 * 60 * 60 * 24 * 7,
+      60 * 60 * 24 * 7 * 1000,
     );
 
     return {
@@ -147,25 +143,43 @@ export const verifyEmail = async (email: string, otp: string) => {
 export const newRefreshToken = async () => {
   try {
     const cookieStore = await cookies();
-    const cookieHeaders = cookieStore.getAll().map(cookie => `${cookie.name}=${cookie.value}`).join("; ");
+    const cookieHeaders = cookieStore
+      .getAll()
+      .map((cookie) => `${cookie.name}=${cookie.value}`)
+      .join("; ");
 
-    const res = await fetch(`${env.AUTH_URL}/refresh-token`,{
-      method : "POST",
-      headers : {
-        Cookie : cookieHeaders,
-        "content-type" : "application/json"
-      }
-    })
+    const res = await fetch(`${env.AUTH_URL}/refresh-token`, {
+      method: "POST",
+      headers: {
+        Cookie: cookieHeaders,
+        "content-type": "application/json",
+      },
+    });
 
     const result = await res.json();
 
-    await setToken("accessToken",result.data.accessToken,60 * 15)
-    await setToken("refreshToken",result.data.accessToken,60 * 60 * 60 * 24 * 7)
-    await setToken("better-auth.session_token",result.data.accessToken,60 * 60 * 60 * 24 * 7)
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message,
+      };
+    }
+
+    await setToken("accessToken", result.data.accessToken, 60 * 15 * 1000);
+    await setToken(
+      "refreshToken",
+      result.data.refreshToken,
+      24 * 60 * 60 * 7 * 1000,
+    );
+    await setToken(
+      "better-auth.session_token",
+      result.data.token,
+      60 * 60 * 24 * 7 * 1000,
+    );
 
     return result;
   } catch (error) {
     console.log(error);
     throw error;
   }
-}
+};
