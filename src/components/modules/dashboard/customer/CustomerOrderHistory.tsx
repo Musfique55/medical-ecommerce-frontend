@@ -1,10 +1,8 @@
-
 import { Order } from "@/types";
 import { Package } from "lucide-react";
 import Link from "next/link";
 
-const CustomerOrderHistory = ({orders} : {orders : Order[]}) => {
-
+const CustomerOrderHistory = ({ orders }: { orders: Order[] }) => {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4 sm:mb-6">

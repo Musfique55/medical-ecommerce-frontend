@@ -1,21 +1,21 @@
 import DashboardHeader from "@/components/modules/dashboard/DashboardHeader";
 import DashboardSidebar from "@/components/modules/dashboard/DashboardSidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { getSession } from "@/services/user/user.services";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+  const sessionPromise = getSession();
+
   return (
-    <div>
-      <SidebarProvider>
-        <SidebarTrigger />
-        <div className="flex">
-          <DashboardSidebar />
-          <div>
-            <DashboardHeader />
-            {children}
-          </div>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full">
+        <DashboardSidebar />
+        <div className="flex-1 flex flex-col min-w-0">
+          <DashboardHeader sessionPromise={sessionPromise} />
+          {children}
         </div>
-      </SidebarProvider>
-    </div>
+      </div>
+    </SidebarProvider>
   );
 };
 

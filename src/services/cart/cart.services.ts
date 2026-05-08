@@ -2,6 +2,7 @@
 import { env } from "../../../env";
 import { v4 as uuidv4 } from "uuid";
 import { cookies } from "next/headers";
+import { jwtUtils } from "@/utils/jwtUtils";
 
 interface ProductPayload {
   productId: string;
@@ -12,10 +13,15 @@ interface ProductPayload {
 
 export const addToCart = async (product: ProductPayload, quantity: number) => {
   const cookie = await cookies();
+  const accessToken = cookie.get("accessToken")?.value;
+  const id = accessToken ? jwtUtils.decodeToken(accessToken).id : null;
   let cartId = cookie.get("cart_id")?.value;
-  if (!cartId) {
-    cookie.set("cart_id", uuidv4());
-    cartId = cookie.get("cart_id")?.value;
+  if (cartId && id && cartId !== id) {
+    //merge cart
+    await mergeCart();
+    cartId = id as string;
+  } else if (accessToken && !cartId) {
+    cartId = id as string;
   }
   try {
     const res = await fetch(`${env.API_URL}/cart`, {
@@ -40,6 +46,8 @@ export const addToCart = async (product: ProductPayload, quantity: number) => {
 
     const result = await res.json();
 
+    console.log(result);
+
     if (!result.success) {
       return {
         success: false,
@@ -47,6 +55,8 @@ export const addToCart = async (product: ProductPayload, quantity: number) => {
         data: null,
       };
     }
+
+    cookie.set("cart_id", result.data.cartId);
 
     return {
       success: true,
@@ -137,7 +147,11 @@ export const mergeCart = async () => {
     });
 
     const result = await res.json();
-
+    if (!result.success) {
+      throw new Error(result.message);
+    }
+    cookie.delete("cart_id");
+    cookie.set("cart_id", result.data.id);
     return result;
   } catch (error) {
     console.log(error);

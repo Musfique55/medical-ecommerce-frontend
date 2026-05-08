@@ -46,7 +46,7 @@ const CartItems = () => {
       }
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
-    500
+    500,
   );
 
   const handleUpdateQuantity = (id: string, quantity: number) => {
@@ -62,7 +62,7 @@ const CartItems = () => {
         },
       };
     });
-    
+
     debouncedUpdateAPI(id, quantity);
   };
 
@@ -97,7 +97,6 @@ const CartItems = () => {
   const discount = promoApplied ? subtotal * 0.1 : 0; // 10% discount when promo applied
   const tax = (subtotal - discount) * 0.08; // 8% tax
   const total = subtotal + shipping - discount + tax;
-  console.log(items);
 
   return (
     <div>
@@ -106,12 +105,12 @@ const CartItems = () => {
           Shopping Cart
         </h1>
         <p className="text-lg text-gray-600">
-          {items?.data?.items.length}{" "}
-          {items?.data?.items.length === 1 ? "item" : "items"} in your cart
+          {items?.data?.items?.length}{" "}
+          {items?.data?.items?.length === 1 ? "item" : "items"} in your cart
         </p>
       </div>
 
-      {items?.data?.items.length === 0 ? (
+      {items?.data?.items?.length === 0 ? (
         // Empty Cart State
         <div className="text-center py-20">
           <div className="bg-blue-50 size-32 rounded-full flex items-center justify-center mx-auto mb-8">

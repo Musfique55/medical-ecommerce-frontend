@@ -1,42 +1,61 @@
-import Filters from "@/components/modules/category-products/filter";
-import { ProductCard } from "@/components/modules/layout/ProductCard";
-// import { categoryServices } from "@/services/categories/categories.services";
-import { manufacturerServices } from "@/services/manufacturer/manufacturer.services";
-// import { productServices } from "@/services/products/products.services";
-import { Product } from "@/types";
+import CategoryWrapper from "@/components/modules/category-products/category-wrapper";
+import { getCategories } from "@/services/categories/categories.services";
+import { getManufacturer } from "@/services/manufacturer/manufacturer.services";
+import { getProducts } from "@/services/products/products.services";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 
-const AllCategoriesProducts = async ({searchParams} : {searchParams : Promise<{ [key: string]: string | undefined}>}) => {
+const AllCategoriesProductsPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}) => {
+  const {
+    "retails_price[gte]": retails_price,
+    searchTerm,
+    category,
+    manufacturer,
+  } = await searchParams;
 
-  const {maxPrice,manufacturer} = await searchParams;  
+  const queryClient = new QueryClient();
 
-  // const categoriesData = categoryServices.getCategories();
-  const manufacturerData = manufacturerServices.getManufacturer();
-  // const productsData = productServices.getProducts({
-  //   manufacturer,
-  //   maxPrice
-  // });
-
-  const [ manufacturers] = await Promise.all([
-    // categoriesData,
-    manufacturerData,
-    // productsData,
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: [
+        "products",
+        {
+          category: category || "",
+          searchTerm: searchTerm || "",
+          retails_price: retails_price || "",
+          manufacturer: manufacturer || "",
+        },
+      ],
+      queryFn: () =>
+        getProducts({
+          retails_price: retails_price ? { gte: retails_price } : undefined,
+          searchTerm: searchTerm || undefined,
+          category: category || undefined,
+          "manufacturer.name": manufacturer || undefined,
+        }),
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["categories"],
+      queryFn: () => getCategories(),
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["manufacturers"],
+      queryFn: () => getManufacturer(),
+    }),
   ]);
 
   return (
-    <div className="flex p-8 bg-gray-50">
-      {/* <Filters
-        categories={categories.data}
-        manufacturers={manufacturers.data}
-        maxPrice={products.data.max_price}
-      /> */}
-      <div className="grid grid-cols-3 gap-5">
-        {/* {products?.data?.data?.length > 0 &&
-          products?.data?.data.map((item: Product) => (
-            <ProductCard key={item.id} product={item} />
-          ))} */}
-      </div>
-    </div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <CategoryWrapper />
+    </HydrationBoundary>
   );
 };
 
-export default AllCategoriesProducts;
+export default AllCategoriesProductsPage;

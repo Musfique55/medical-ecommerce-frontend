@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Roles } from "@/constants/roles";
 import { ShoppingBag } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
   {
@@ -20,12 +21,16 @@ const navLinks = [
     role: Roles.CUSTOMER,
     routes: [
       {
+        title: "Dashboard",
+        path: "/customer/dashboard",
+      },
+      {
         title: "Orders",
-        path: "/dashboard/orders",
+        path: "/customer/orders",
       },
       {
         title: "Wishlist",
-        path: "/dashboard/wishlist",
+        path: "/customer/wishlist",
       },
     ],
   },
@@ -46,6 +51,8 @@ const navLinks = [
 ];
 
 export default function DashboardSidebar() {
+  const pathname = usePathname();
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -60,11 +67,23 @@ export default function DashboardSidebar() {
       <SidebarContent>
         {navLinks.map((group, index) => (
           <SidebarGroup key={index}>
-            <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">{group.title}</p>
+            <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              {group.title}
+            </p>
             <SidebarMenu>
               {group.routes.map((route) => (
-                <SidebarMenuItem key={route.path}>
-                  <SidebarMenuButton asChild className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-gray-600 hover:bg-gray-50 transition-all">
+                <SidebarMenuItem
+                  className={`${pathname?.includes(route.path) ? "bg-teal-500/20 rounded-md" : ""}`}
+                  key={route.path}
+                >
+                  <SidebarMenuButton
+                    asChild
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all font-semibold ${
+                      pathname?.includes(route.path)
+                        ? "text-teal-600"
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
                     <Link href={route.path}>{route.title}</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

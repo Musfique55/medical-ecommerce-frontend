@@ -6,9 +6,10 @@ import { use } from "react";
 const Navbar = ({
   categoryPromise,
 }: {
-  categoryPromise: Promise<{ data: Category[] }>;
+  categoryPromise: Promise<Category[]>;
 }) => {
   const categories = use(categoryPromise);
+
   return (
     <div>
       <nav className="border-t hidden md:block">
@@ -22,12 +23,12 @@ const Navbar = ({
                 All Categories
               </Link>
             </li>
-            {categories?.data &&
-              categories.data.length > 0 &&
-              categories.data.map((item) => (
+            {categories &&
+              categories.length > 0 &&
+              categories.map((item) => (
                 <li key={item.id}>
                   <Link
-                    href={`/category/${item.slug}`}
+                    href={`/category?category=${item.slug}`}
                     className="text-teal-700 font-semibold hover:text-teal-800 text-nowrap text-xs"
                   >
                     {item.category_name}

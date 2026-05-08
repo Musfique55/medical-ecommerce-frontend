@@ -6,7 +6,6 @@ import { cookies } from "next/headers";
 
 export const placeOrder = async (payload: OrderPayload) => {
   try {
-    console.log(payload);
     const cookieStore = await cookies();
     const res = await fetch(`${env.API_URL}/orders`, {
       method: "POST",
@@ -17,13 +16,15 @@ export const placeOrder = async (payload: OrderPayload) => {
       body: JSON.stringify(payload),
     });
 
-    console.log(res);
+    const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error("Order Failed");
+    if (!data.success) {
+      throw new Error(data.message);
     }
 
-    const data = await res.json();
+    // clear cart
+    cookieStore.delete("cart_id");
+
     return data;
   } catch (error) {
     console.log(error);

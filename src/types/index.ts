@@ -23,7 +23,7 @@ export interface Product {
   name: string;
   description: string;
   retails_price: number;
-  discount_type: discountType;
+  discount_type: "NONE" | "PERCENTAGE" | "FIXED";
   discount_value: number;
   image_url: string[];
   category: Category;
@@ -108,6 +108,7 @@ export interface Order {
   payment_status: string;
   order_items: OrderItem[];
   delivery_method: string;
+  total_amount: number;
   shipping_address: {
     fullName: string;
     email: string;
@@ -118,6 +119,7 @@ export interface Order {
     city: string;
     zip_code: string;
   };
+  created_at?: string;
 }
 
 export interface Manufacturer {
@@ -132,11 +134,24 @@ export interface Manufacturer {
   updated_at: string;
 }
 
-export enum discountType {
-  NONE,
-  PERCENTAGE,
-  FIXED,
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image: string | null;
+  role: string;
+  status: string;
+  phone: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
+
+// export enum discountType {
+//   NONE,
+//   PERCENTAGE,
+//   FIXED,
+// }
 
 // export enum orderStatus {
 //    "PENDING",

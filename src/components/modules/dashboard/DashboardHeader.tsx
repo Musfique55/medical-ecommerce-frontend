@@ -1,29 +1,36 @@
-"use client"
+"use client";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Roles } from "@/constants/roles";
-import { authClient } from "@/lib/authClient";
-import { Bell, Menu, Search } from "lucide-react";
+import { User } from "@/types";
+import { Bell, Search } from "lucide-react";
+import { use } from "react";
 
-const DashboardHeader = () => {
-    const user = authClient.useSession();
+const DashboardHeader = ({
+  sessionPromise,
+}: {
+  sessionPromise: Promise<{ data: User | null; error: string | null }>;
+}) => {
+  const { data: user, error } = use(sessionPromise);
+
   return (
     <div>
       <header className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            {/* Mobile Menu Button */}
-            <button
-              className="lg:hidden p-2 hover:bg-gray-100 rounded-lg flex-shrink-0"
-            //   onClick={() => setIsSidebarOpen(true)}
-            >
-              <Menu className="w-6 h-6 text-gray-600" />
-            </button>
+            {/* Sidebar toggle — works on both mobile (sheet) and desktop */}
+            <SidebarTrigger className="p-2 hover:bg-gray-100 rounded-lg flex-shrink-0 lg:hidden" />
 
             <div className="min-w-0">
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-0.5 truncate">
-                {user?.data?.user?.role === Roles.CUSTOMER ? "Customer Dashboard" : user?.data?.user?.role === Roles.SELLER ? "Seller Dashboard" : "Admin Dashboard"} 
+                {user?.role === Roles.CUSTOMER
+                  ? "Customer Dashboard"
+                  : user?.role === Roles.SELLER
+                    ? "Seller Dashboard"
+                    : "Admin Dashboard"}
               </h1>
               <p className="text-sm sm:text-base text-gray-600 hidden sm:block">
-                Welcome back, {user?.data?.user?.name.split(" ")[0]} Monitoring your active shipments.
+                Welcome back, {user?.name.split(" ")[0]} Monitoring your active
+                shipments.
               </p>
             </div>
           </div>

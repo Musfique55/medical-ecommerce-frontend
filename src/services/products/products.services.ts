@@ -1,11 +1,8 @@
-"use server";
-import { env } from "../../../env";
-
 interface Params {
   category?: string | undefined;
-  minPrice?: string;
-  maxPrice?: string | undefined;
-  manufacturer?: string | undefined;
+  retails_price?: { gte?: string };
+  "manufacturer.name"?: string | undefined;
+  searchTerm?: string | undefined;
 }
 
 interface Options {
@@ -15,10 +12,27 @@ interface Options {
 
 export const getProducts = async (params?: Params, options?: Options) => {
   try {
-    const url = new URL(`${env.API_URL}/medicines`);
+    const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/medicines`);
+
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined || value !== "" || value !== null) {
+        if (value === undefined || value === null || value === "") return;
+
+        // Handle nested objects like retails_price: { gte: "32" } → retails_price[gte]=32
+        if (typeof value === "object") {
+          Object.entries(value).forEach(([nestedKey, nestedValue]) => {
+            if (
+              nestedValue !== undefined &&
+              nestedValue !== null &&
+              nestedValue !== ""
+            ) {
+              url.searchParams.append(
+                `${key}[${nestedKey}]`,
+                nestedValue as string,
+              );
+            }
+          });
+        } else {
           url.searchParams.append(key, value);
         }
       });
@@ -37,16 +51,18 @@ export const getProducts = async (params?: Params, options?: Options) => {
     const res = await fetch(url.toString(), config);
     const data = await res.json();
 
-    return { data: data, error: null };
-  } catch (error) {
+    return data.data;
+  } catch (error: any) {
     console.log(error);
-    return { data: null, error: error };
+    throw new Error(error.message);
   }
 };
 
 export const getProduct = async (slug: string) => {
   try {
-    const res = await fetch(`${env.API_URL}/medicines/${slug}`);
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/medicines/${slug}`,
+    );
     const data = await res.json();
 
     return { data: data.data, error: null };
