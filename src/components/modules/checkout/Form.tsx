@@ -10,8 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import useCartSnapshot from "@/hooks/useCartSnapshot";
 import useSteps from "@/hooks/useSteps";
-// import { cartServices } from "@/services/cart/cart.services";
-import { cartItem, OrderPayload } from "@/types";
+import { OrderPayload } from "@/types";
 import { useForm } from "@tanstack/react-form";
 import { CheckCircle2, CreditCard, MapPin, Shield, User } from "lucide-react";
 import { toast } from "sonner";
@@ -54,7 +53,7 @@ const Form = () => {
       const orderSchema: OrderPayload = {
         customer_id: "zW9kXLeuVLLU8spcNCYZ83fF5F6ew9jD",
         order_items: (items?.data?.items || []).map((item: any) => ({
-          product_id: item.productId || item.id,
+          product_id: item.product_id,
           quantity: item.quantity,
         })),
         delivery_method: "COD",
@@ -73,9 +72,11 @@ const Form = () => {
       const toastId = toast.loading("Order is placing...");
       try {
         const res = await placeOrder(orderSchema);
-        console.log(res);
+        if (!res.success) {
+          toast.error(res.message || "Failed to place order", { id: toastId });
+          return;
+        }
         toast.success("order placed successfully", { id: toastId });
-        // cartServices.clearCart();
         updateStep(2);
       } catch (error: any) {
         toast.error(error.message || "something went wrong", { id: toastId });

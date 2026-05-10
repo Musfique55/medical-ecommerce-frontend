@@ -1,11 +1,10 @@
 "use server";
 import { env } from "../../../env";
-import { v4 as uuidv4 } from "uuid";
 import { cookies } from "next/headers";
 import { jwtUtils } from "@/utils/jwtUtils";
 
 interface ProductPayload {
-  productId: string;
+  product_id: string;
   name: string;
   image: string | null;
   price: number;
@@ -23,6 +22,7 @@ export const addToCart = async (product: ProductPayload, quantity: number) => {
   } else if (accessToken && !cartId) {
     cartId = id as string;
   }
+
   try {
     const res = await fetch(`${env.API_URL}/cart`, {
       method: "POST",
@@ -36,17 +36,7 @@ export const addToCart = async (product: ProductPayload, quantity: number) => {
       },
     });
 
-    if (!res.ok) {
-      return {
-        success: false,
-        message: res.statusText,
-        data: null,
-      };
-    }
-
     const result = await res.json();
-
-    console.log(result);
 
     if (!result.success) {
       return {
@@ -56,7 +46,7 @@ export const addToCart = async (product: ProductPayload, quantity: number) => {
       };
     }
 
-    cookie.set("cart_id", result.data.cartId);
+    cookie.set("cart_id", result.data.cart_id);
 
     return {
       success: true,
@@ -84,6 +74,13 @@ export const getCartItems = async () => {
 
     const result = await res.json();
 
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message,
+        data: null,
+      };
+    }
     return result;
   } catch (error) {
     console.log(error);
@@ -102,6 +99,14 @@ export const removeProductFromCart = async (productId: string) => {
     });
 
     const result = await res.json();
+
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message,
+        data: null,
+      };
+    }
 
     return result;
   } catch (error) {
@@ -128,6 +133,14 @@ export const updateQuantityFromCart = async (
     });
 
     const result = await res.json();
+
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message,
+        data: null,
+      };
+    }
 
     return result;
   } catch (error) {

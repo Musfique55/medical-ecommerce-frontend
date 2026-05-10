@@ -1,8 +1,11 @@
+"use client";
 
 import { ArrowLeft } from "lucide-react";
 import Form from "@/components/modules/checkout/Form";
 import OrderSummary from "@/components/modules/checkout/OrderSummary";
+import OrderConfirmation from "@/components/modules/checkout/OrderConfirmation";
 import Link from "next/link";
+import useSteps from "@/hooks/useSteps";
 
 export interface OrderDetails {
   firstName: string;
@@ -19,6 +22,9 @@ export interface OrderDetails {
 }
 
 export default function CheckoutPage() {
+  const steps = useSteps((state) => state.steps);
+  const activeStep = steps.find((s) => s.active)?.num || 2;
+
   return (
     <div className="min-h-screen bg-linear-to-b from-blue-50/30 to-white">
       {/* Header */}
@@ -36,13 +42,19 @@ export default function CheckoutPage() {
 
       <div className="container mx-auto px-6 py-12 lg:py-16">
         <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
-          {/* Main Form */}
-          <div className="lg:col-span-2 space-y-8">
-            <Form />
-          </div>
+          {activeStep === 3 ? (
+            <OrderConfirmation />
+          ) : (
+            <>
+              {/* Main Form */}
+              <div className="lg:col-span-2 space-y-8">
+                <Form />
+              </div>
 
-          {/* Order Summary Sidebar */}
-          <OrderSummary />
+              {/* Order Summary Sidebar */}
+              <OrderSummary />
+            </>
+          )}
         </div>
       </div>
     </div>

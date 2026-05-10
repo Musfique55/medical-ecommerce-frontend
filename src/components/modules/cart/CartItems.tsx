@@ -50,6 +50,10 @@ const CartItems = () => {
   );
 
   const handleUpdateQuantity = (id: string, quantity: number) => {
+    if (quantity === 0) {
+      handleRemove(id);
+      return;
+    }
     queryClient.setQueryData(["cart"], (oldData: any) => {
       if (!oldData?.data?.items) return oldData;
       return {
@@ -110,7 +114,7 @@ const CartItems = () => {
         </p>
       </div>
 
-      {items?.data?.items?.length === 0 ? (
+      {items?.data && items?.data?.items?.length === 0 ? (
         // Empty Cart State
         <div className="text-center py-20">
           <div className="bg-blue-50 size-32 rounded-full flex items-center justify-center mx-auto mb-8">
@@ -132,139 +136,141 @@ const CartItems = () => {
         <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-6">
-            {items?.data?.items.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-3xl p-6 lg:p-8 border border-blue-100 hover:shadow-lg hover:shadow-blue-100/50 transition-all"
-              >
-                <div className="grid md:grid-cols-4 gap-6">
-                  {/* Product Image */}
-                  <div className="aspect-square bg-gradient-to-br from-blue-50 to-sky-50 rounded-2xl overflow-hidden">
-                    {/* <Image
+            {items?.data &&
+              items?.data?.items?.length > 0 &&
+              items?.data?.items.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-3xl p-6 lg:p-8 border border-blue-100 hover:shadow-lg hover:shadow-blue-100/50 transition-all"
+                >
+                  <div className="grid md:grid-cols-4 gap-6">
+                    {/* Product Image */}
+                    <div className="aspect-square bg-gradient-to-br from-blue-50 to-sky-50 rounded-2xl overflow-hidden">
+                      {/* <Image
                         src={item.image}
                         alt={item.name}
                         fill
                         className="w-full h-full object-cover"
                       /> */}
-                  </div>
-
-                  {/* Product Info */}
-                  <div className="md:col-span-2 space-y-3">
-                    <div>
-                      <div className="text-xs text-blue-600 font-semibold mb-1 uppercase tracking-wide">
-                        {/* {item.category} */}
-                      </div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2 leading-snug">
-                        {item.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">
-                        {/* {item.description} */}
-                      </p>
                     </div>
 
-                    {/* Quantity Controls - Mobile */}
-                    <div className="md:hidden flex items-center gap-3">
-                      <div className="flex items-center gap-2 bg-blue-50 rounded-2xl p-1.5">
+                    {/* Product Info */}
+                    <div className="md:col-span-2 space-y-3">
+                      <div>
+                        <div className="text-xs text-blue-600 font-semibold mb-1 uppercase tracking-wide">
+                          {/* {item.category} */}
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2 leading-snug">
+                          {item.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">
+                          {/* {item.description} */}
+                        </p>
+                      </div>
+
+                      {/* Quantity Controls - Mobile */}
+                      <div className="md:hidden flex items-center gap-3">
+                        <div className="flex items-center gap-2 bg-blue-50 rounded-2xl p-1.5">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="size-9 rounded-xl hover:bg-white"
+                            onClick={() =>
+                              handleUpdateQuantity(
+                                item.productId,
+                                item.quantity - 1,
+                              )
+                            }
+                          >
+                            <Minus className="size-4" />
+                          </Button>
+                          <span className="w-10 text-center font-bold">
+                            {item.quantity}
+                          </span>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="size-9 rounded-xl hover:bg-white"
+                            onClick={() =>
+                              handleUpdateQuantity(
+                                item.productId,
+                                item.quantity + 1,
+                              )
+                            }
+                          >
+                            <Plus className="size-4" />
+                          </Button>
+                        </div>
+
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="size-9 rounded-xl hover:bg-white"
-                          onClick={() =>
-                            handleUpdateQuantity(
-                              item.productId,
-                              item.quantity - 1,
-                            )
-                          }
+                          className="size-9 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl ml-auto"
+                          onClick={() => handleRemove(item.productId)}
                         >
-                          <Minus className="size-4" />
+                          <Trash2 className="size-4" />
                         </Button>
-                        <span className="w-10 text-center font-bold">
-                          {item.quantity}
-                        </span>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="size-9 rounded-xl hover:bg-white"
-                          onClick={() =>
-                            handleUpdateQuantity(
-                              item.productId,
-                              item.quantity + 1,
-                            )
-                          }
-                        >
-                          <Plus className="size-4" />
-                        </Button>
-                      </div>
-
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="size-9 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl ml-auto"
-                        onClick={() => handleRemove(item.productId)}
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Price & Actions - Desktop */}
-                  <div className="flex md:flex-col justify-between items-end md:items-end">
-                    <div className="text-right">
-                      <div className="text-3xl font-bold text-blue-600 mb-1">
-                        ${(item.price * item.quantity).toFixed(2)}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        ${item.price.toFixed(2)} each
                       </div>
                     </div>
 
-                    {/* Quantity Controls - Desktop */}
-                    <div className="hidden md:flex flex-col gap-3">
-                      <div className="flex items-center gap-2 bg-blue-50 rounded-2xl p-1.5">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="size-9 rounded-xl hover:bg-white"
-                          onClick={() =>
-                            handleUpdateQuantity(
-                              item.productId,
-                              item.quantity - 1,
-                            )
-                          }
-                        >
-                          <Minus className="size-4" />
-                        </Button>
-                        <span className="w-10 text-center font-bold">
-                          {item.quantity}
-                        </span>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="size-9 rounded-xl hover:bg-white"
-                          onClick={() =>
-                            handleUpdateQuantity(
-                              item.productId,
-                              item.quantity + 1,
-                            )
-                          }
-                        >
-                          <Plus className="size-4" />
-                        </Button>
+                    {/* Price & Actions - Desktop */}
+                    <div className="flex md:flex-col justify-between items-end md:items-end">
+                      <div className="text-right">
+                        <div className="text-3xl font-bold text-blue-600 mb-1">
+                          ${(item.price * item.quantity).toFixed(2)}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          ${item.price.toFixed(2)} each
+                        </div>
                       </div>
 
-                      <Button
-                        variant="ghost"
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl text-sm"
-                        onClick={() => handleRemove(item.productId)}
-                      >
-                        <Trash2 className="size-4 mr-1" />
-                        Remove
-                      </Button>
+                      {/* Quantity Controls - Desktop */}
+                      <div className="hidden md:flex flex-col gap-3">
+                        <div className="flex items-center gap-2 bg-blue-50 rounded-2xl p-1.5">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="size-9 rounded-xl hover:bg-white"
+                            onClick={() =>
+                              handleUpdateQuantity(
+                                item.productId,
+                                item.quantity - 1,
+                              )
+                            }
+                          >
+                            <Minus className="size-4" />
+                          </Button>
+                          <span className="w-10 text-center font-bold">
+                            {item.quantity}
+                          </span>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="size-9 rounded-xl hover:bg-white"
+                            onClick={() =>
+                              handleUpdateQuantity(
+                                item.productId,
+                                item.quantity + 1,
+                              )
+                            }
+                          >
+                            <Plus className="size-4" />
+                          </Button>
+                        </div>
+
+                        <Button
+                          variant="ghost"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl text-sm"
+                          onClick={() => handleRemove(item.productId)}
+                        >
+                          <Trash2 className="size-4 mr-1" />
+                          Remove
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
             {/* Promo Code */}
             <div className="bg-gradient-to-br from-blue-50 to-sky-50 rounded-3xl p-6 lg:p-8 border border-blue-100">

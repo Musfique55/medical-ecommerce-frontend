@@ -30,22 +30,18 @@ export const login = async (email: string, password: string) => {
     throw new Error(data?.message);
   }
 
-  await setToken("accessToken", data.data.accessToken, 60 * 15 * 1000);
-  await setToken(
-    "refreshToken",
-    data.data.refreshToken,
-    60 * 60 * 24 * 7 * 1000,
-  );
+  await setToken("accessToken", data.data.accessToken, 60 * 15);
+  await setToken("refreshToken", data.data.refreshToken, 60 * 60 * 24 * 7);
   await setToken(
     "better-auth.session_token",
     data.data.token,
-    60 * 60 * 24 * 7 * 1000,
+    60 * 60 * 24 * 7,
   );
 
   const cart = await mergeCart();
   if (cart?.success) {
     await deleteCookie("cart_id");
-    await setToken("cart_id", data.data.user.id, 60 * 60 * 24 * 30 * 1000);
+    await setToken("cart_id", data.data.user.id, 60 * 60 * 24 * 30);
   }
 
   return data;
@@ -79,12 +75,8 @@ export const register = async (payload: RegisterPayload) => {
       };
     }
 
-    await setToken("accessToken", result.data.accessToken, 60 * 15 * 1000);
-    await setToken(
-      "refreshToken",
-      result.data.refreshToken,
-      60 * 60 * 24 * 7 * 1000,
-    );
+    await setToken("accessToken", result.data.accessToken, 60 * 15);
+    await setToken("refreshToken", result.data.refreshToken, 60 * 60 * 24 * 7);
 
     return {
       success: true,
@@ -165,17 +157,47 @@ export const newRefreshToken = async () => {
       };
     }
 
-    await setToken("accessToken", result.data.accessToken, 60 * 15 * 1000);
-    await setToken(
-      "refreshToken",
-      result.data.refreshToken,
-      24 * 60 * 60 * 7 * 1000,
-    );
+    await setToken("accessToken", result.data.accessToken, 60 * 15);
+    await setToken("refreshToken", result.data.refreshToken, 24 * 60 * 60 * 7);
     await setToken(
       "better-auth.session_token",
       result.data.token,
-      60 * 60 * 24 * 7 * 1000,
+      60 * 60 * 24 * 7,
     );
+
+    return result;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const logout = async () => {
+  try {
+    const cookieStore = await cookies();
+    const cookieHeaders = `accessToken=${cookieStore.get("accessToken")?.value}; refreshToken=${cookieStore.get("refreshToken")?.value}; better-auth.session_token=${cookieStore.get("better-auth.session_token")?.value};`;
+
+    const res = await fetch(`${env.AUTH_URL}/logout`, {
+      method: "POST",
+      headers: {
+        Cookie: cookieHeaders,
+        "content-type": "application/json",
+      },
+    });
+
+    const result = await res.json();
+
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message,
+      };
+    }
+
+    await deleteCookie("accessToken");
+    await deleteCookie("refreshToken");
+    await deleteCookie("better-auth.session_token");
+    await deleteCookie("cart_id");
 
     return result;
   } catch (error) {

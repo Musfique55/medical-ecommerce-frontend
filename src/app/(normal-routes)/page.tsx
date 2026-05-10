@@ -4,24 +4,17 @@ import FeaturedProducts from "@/components/modules/home/FeaturedProducts";
 import { Hero } from "@/components/modules/home/Hero";
 import { TrustBadges } from "@/components/modules/home/TrustBadges";
 import { getProducts } from "@/services/products/products.services";
-// import { categoryServices } from "@/services/categories/categories.services";
-
-
-
+import { getCategories } from "@/services/categories/categories.services";
 
 export default async function Home() {
-  // const categoriesData =  categoryServices.getCategories();
-  // const productsData =  productServices.getProducts();
-  const [products] = await Promise.all([
-    getProducts()
-  ]);
+  const productsPromise = getProducts();
+  const categoriesPromise = getCategories();
 
-  // console.log(products);
   return (
     <>
       <Hero />
-      {/* <Categories categories={categories}/> */}
-      <FeaturedProducts products={products.data}/>
+      <Categories categoriesPromise={categoriesPromise} />
+      <FeaturedProducts productsPromise={productsPromise} />
       <Benefits />
       <TrustBadges />
     </>

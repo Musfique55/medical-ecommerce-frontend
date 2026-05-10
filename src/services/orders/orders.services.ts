@@ -33,8 +33,6 @@ export const getDeliveredOrders = async () => {
       },
     });
 
-    console.log(res);
-
     return { data: res.data, error: null };
   } catch (error: any) {
     console.log(error);

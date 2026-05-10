@@ -13,7 +13,6 @@ import { useState } from "react";
 import { login } from "@/services/auth/auth.services";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { env } from "../../../../env";
 
 export function LoginForm({ redirect }: { redirect: string }) {
   const [showPassword, setShowPassword] = useState(false);

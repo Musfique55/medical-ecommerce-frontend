@@ -17,16 +17,25 @@ export const placeOrder = async (payload: OrderPayload) => {
     });
 
     const data = await res.json();
+    console.log(data);
 
     if (!data.success) {
-      throw new Error(data.message);
+      return {
+        message: data.message,
+        success: false,
+        data: null,
+      };
     }
 
     // clear cart
     cookieStore.delete("cart_id");
 
     return data;
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    return {
+      message: error.message,
+      success: false,
+      data: null,
+    };
   }
 };
