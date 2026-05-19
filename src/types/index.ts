@@ -38,10 +38,10 @@ export interface cartItem {
   id: string;
   items: {
     id: string;
-    productId: string;
+    product_id: string;
     quantity: number;
     price: number;
-    cartId: string;
+    cart_id: string;
     name: string;
     image: string | null;
   }[];

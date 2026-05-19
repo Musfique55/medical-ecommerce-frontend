@@ -37,19 +37,27 @@ const CartItems = () => {
   };
 
   const debouncedUpdateAPI = useDebouncedCallback(
-    async (id: string, quantity: number) => {
-      const res = await updateQuantityFromCart(id, quantity);
+    async (
+      operation: "increment" | "decrement",
+      id: string,
+      quantity: number,
+    ) => {
+      const res = await updateQuantityFromCart(operation, id, quantity);
       if (!res.success) {
         toast.error(res.message);
-      } else {
-        toast.success(res.message);
+        return;
       }
+      toast.success(res.message);
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
     500,
   );
 
-  const handleUpdateQuantity = (id: string, quantity: number) => {
+  const handleUpdateQuantity = (
+    operation: "increment" | "decrement",
+    id: string,
+    quantity: number,
+  ) => {
     if (quantity === 0) {
       handleRemove(id);
       return;
@@ -61,13 +69,13 @@ const CartItems = () => {
         data: {
           ...oldData.data,
           items: oldData.data.items.map((item: any) =>
-            item.productId === id ? { ...item, quantity } : item,
+            item.product_id === id ? { ...item, quantity } : item,
           ),
         },
       };
     });
 
-    debouncedUpdateAPI(id, quantity);
+    debouncedUpdateAPI(operation, id, quantity);
   };
 
   const handleRemove = async (id: string) => {
@@ -78,7 +86,7 @@ const CartItems = () => {
         data: {
           ...oldData.data,
           items: oldData.data.items.filter(
-            (item: any) => item.productId !== id,
+            (item: any) => item.product_id !== id,
           ),
         },
       };
@@ -177,7 +185,8 @@ const CartItems = () => {
                             className="size-9 rounded-xl hover:bg-white"
                             onClick={() =>
                               handleUpdateQuantity(
-                                item.productId,
+                                "decrement",
+                                item.product_id,
                                 item.quantity - 1,
                               )
                             }
@@ -193,7 +202,8 @@ const CartItems = () => {
                             className="size-9 rounded-xl hover:bg-white"
                             onClick={() =>
                               handleUpdateQuantity(
-                                item.productId,
+                                "increment",
+                                item.product_id,
                                 item.quantity + 1,
                               )
                             }
@@ -206,7 +216,7 @@ const CartItems = () => {
                           size="icon"
                           variant="ghost"
                           className="size-9 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl ml-auto"
-                          onClick={() => handleRemove(item.productId)}
+                          onClick={() => handleRemove(item.product_id)}
                         >
                           <Trash2 className="size-4" />
                         </Button>
@@ -220,7 +230,7 @@ const CartItems = () => {
                           ${(item.price * item.quantity).toFixed(2)}
                         </div>
                         <div className="text-sm text-gray-500">
-                          ${item.price.toFixed(2)} each
+                          ${(item.price * 1).toFixed(2)} each
                         </div>
                       </div>
 
@@ -233,7 +243,8 @@ const CartItems = () => {
                             className="size-9 rounded-xl hover:bg-white"
                             onClick={() =>
                               handleUpdateQuantity(
-                                item.productId,
+                                "decrement",
+                                item.product_id,
                                 item.quantity - 1,
                               )
                             }
@@ -249,7 +260,8 @@ const CartItems = () => {
                             className="size-9 rounded-xl hover:bg-white"
                             onClick={() =>
                               handleUpdateQuantity(
-                                item.productId,
+                                "increment",
+                                item.product_id,
                                 item.quantity + 1,
                               )
                             }
@@ -261,7 +273,7 @@ const CartItems = () => {
                         <Button
                           variant="ghost"
                           className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl text-sm"
-                          onClick={() => handleRemove(item.productId)}
+                          onClick={() => handleRemove(item.product_id)}
                         >
                           <Trash2 className="size-4 mr-1" />
                           Remove

@@ -1,5 +1,4 @@
-
-import  { Suspense } from "react";
+import { Suspense } from "react";
 import Navbar from "../Navbar";
 import { Button } from "../../../ui/button";
 import { Phone, Search } from "lucide-react";
@@ -9,11 +8,9 @@ import Actions from "./Actions";
 import SearchBar from "./SearchBar";
 import { getCategories } from "@/services/categories/categories.services";
 
-
-
 const Header = () => {
   const categoryPromise = getCategories();
-  // console.log(categoryPromise);
+
   return (
     <div>
       <header className="bg-white border-b sticky top-0 z-50">
@@ -36,7 +33,7 @@ const Header = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-4">
             {/* Logo */}
-            <Link href={'/'} className="flex items-center gap-2">
+            <Link href={"/"} className="flex items-center gap-2">
               <div className="bg-teal-600 text-white p-2 rounded-lg">
                 <svg
                   className="size-8"
