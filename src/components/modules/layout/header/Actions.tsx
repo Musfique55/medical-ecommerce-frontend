@@ -18,7 +18,7 @@ const Actions = () => {
     <div className="flex items-center gap-2">
       {user?.data ? (
         user?.data?.role === "CUSTOMER" ? (
-          <Link href={"/dashboard/customer"}>
+          <Link href={"/customer/dashboard"}>
             <Button
               variant="ghost"
               size="icon"
@@ -28,7 +28,7 @@ const Actions = () => {
             </Button>
           </Link>
         ) : user?.data?.role === "ADMIN" ? (
-          <Link href={"/dashboard/admin"}>
+          <Link href={"/admin/dashboard"}>
             <Button
               variant="ghost"
               size="icon"
@@ -38,7 +38,7 @@ const Actions = () => {
             </Button>
           </Link>
         ) : (
-          <Link href={"/dashboard/seller"}>
+          <Link href={"/seller/dashboard"}>
             <Button
               variant="ghost"
               size="icon"

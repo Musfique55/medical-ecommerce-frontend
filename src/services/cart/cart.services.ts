@@ -16,7 +16,6 @@ export const addToCart = async (product: ProductPayload, quantity: number) => {
   const id = accessToken ? jwtUtils.decodeToken(accessToken).id : null;
   let cartId = cookie.get("cart_id")?.value;
 
-  console.log(jwtUtils.decodeToken(accessToken!));
   if (cartId && id && cartId !== id) {
     //merge cart
     await mergeCart();
@@ -167,9 +166,7 @@ export const mergeCart = async () => {
     if (!result.success) {
       throw new Error(result.message);
     }
-    console.log(result);
-    cookie.delete("cart_id");
-    cookie.set("cart_id", result.data.id);
+
     return result;
   } catch (error) {
     console.log(error);

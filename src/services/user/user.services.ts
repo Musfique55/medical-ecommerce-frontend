@@ -1,25 +1,32 @@
-"use server"
-import { cookies } from "next/headers";
+"use server";
+import { httpGet } from "@/helper/http-client";
 import { env } from "../../../env";
 
 export const getSession = async () => {
   try {
-    const cookieStores = await cookies();
-    const res = await fetch(`${env.AUTH_URL}/me`, {
-      headers: {
-        Cookie: cookieStores.toString(),
-      },
-      cache: "no-store",
-    });
+    const res = await httpGet(`${env.AUTH_URL}/me`);
 
-    const session = await res.json();
-    if(!session.success){
-      return { data: null, error: session.message };
+    if (!res.success) {
+      return { data: null, error: res.message };
     }
 
-    return { data: session.data, error: null };
-  } catch (error : any) {
+    return { data: res.data, error: null };
+  } catch (error: any) {
     console.log(error);
-    return { data: null, error: error.message ||  "something went wrong" };
+    return { data: null, error: error.message || "something went wrong" };
+  }
+};
+
+export const getAllUsers = async () => {
+  try {
+    const users = await httpGet(`admin/users`);
+
+    if (!users.success) {
+      return { data: null, error: users.message };
+    }
+
+    return { data: users.data, error: null };
+  } catch (error: any) {
+    return { data: null, error: error.message || "something went wrong" };
   }
 };

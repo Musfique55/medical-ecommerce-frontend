@@ -1,29 +1,40 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { verifyEmail } from '@/services/auth/auth.services'
-import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
+import { useState } from "react";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { verifyEmail } from "@/services/auth/auth.services";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-export default function EmailOTP({email} : {email : string}) {
-  const [otp, setOtp] = useState('');
+export default function EmailOTP({ email }: { email: string }) {
+  const [otp, setOtp] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async() => {
+  const handleSubmit = async () => {
     if (otp.length === 4) {
-      setIsSubmitted(true)
-     const res = await verifyEmail(email,otp);
-     if(!res.success){
-        toast.error(res.message)
-     }
-     router.push('/');
-     toast.success(res.message);
+      setIsSubmitted(true);
+      const res = await verifyEmail(email, otp);
+      if (!res.success) {
+        toast.error(res.message);
+        return;
+      }
+      router.push("/");
+      toast.success(res.message);
     }
-  }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
@@ -42,11 +53,7 @@ export default function EmailOTP({email} : {email : string}) {
                   Enter verification code
                 </label>
                 <div className="flex justify-center">
-                  <InputOTP
-                    maxLength={4}
-                    value={otp}
-                    onChange={setOtp}
-                  >
+                  <InputOTP maxLength={4} value={otp} onChange={setOtp}>
                     <InputOTPGroup>
                       <InputOTPSlot index={0} />
                       <InputOTPSlot index={1} />
@@ -64,10 +71,8 @@ export default function EmailOTP({email} : {email : string}) {
                 Verify
               </Button>
               <p className="text-xs text-center text-muted-foreground">
-                Didn&apos;t receive the code?{' '}
-                <button className="text-primary hover:underline">
-                  Resend
-                </button>
+                Didn&apos;t receive the code?{" "}
+                <button className="text-primary hover:underline">Resend</button>
               </p>
             </>
           ) : (
@@ -77,8 +82,8 @@ export default function EmailOTP({email} : {email : string}) {
               </div>
               <Button
                 onClick={() => {
-                  setOtp('')
-                  setIsSubmitted(false)
+                  setOtp("");
+                  setIsSubmitted(false);
                 }}
                 variant="outline"
                 className="w-full"
@@ -90,5 +95,5 @@ export default function EmailOTP({email} : {email : string}) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

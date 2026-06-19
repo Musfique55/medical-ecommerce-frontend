@@ -12,15 +12,18 @@ interface AxiosRequestConfig {
 
 const axiosInstance = async () => {
   const cookieData = await cookies();
-  const accessToken = cookieData.get("accessToken")?.value;
+  let accessToken = cookieData.get("accessToken")?.value;
   const refreshToken = cookieData.get("refreshToken")?.value;
-  const sessionToken = cookieData.get("better-auth.session_token")?.value;
+  let sessionToken = cookieData.get("better-auth.session_token")?.value;
 
   if (!accessToken && refreshToken) {
     await newRefreshToken();
+    const refreshedCookieData = await cookies();
+    accessToken = refreshedCookieData.get("accessToken")?.value;
+    sessionToken = refreshedCookieData.get("better-auth.session_token")?.value;
   }
 
-  const cookieHeader = `accessToken=${accessToken}; refreshToken=${refreshToken}; better-auth.session_token=${sessionToken}`;
+  const cookieHeader = `accessToken=${accessToken}; better-auth.session_token=${sessionToken}`;
 
   const instance = axios.create({
     baseURL: env.API_URL,
@@ -39,7 +42,7 @@ const axiosInstance = async () => {
         originalRequest._retry = true;
         await newRefreshToken();
         const cookieData = await cookies();
-        const cookieHeader = `access_token=${cookieData.get("access_token")?.value}; refresh_token=${cookieData.get("refresh_token")?.value}; better-auth.session_token=${cookieData.get("better-auth.session_token")?.value}`;
+        const cookieHeader = `accessToken=${cookieData.get("accessToken")?.value};  better-auth.session_token=${cookieData.get("better-auth.session_token")?.value}`;
         originalRequest.headers.Cookie = cookieHeader;
         return instance(originalRequest);
       }

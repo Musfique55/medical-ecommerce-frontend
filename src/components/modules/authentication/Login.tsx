@@ -31,7 +31,17 @@ export function LoginForm({ redirect }: { redirect: string }) {
       const res = await login(value.email, value.password);
       return res;
     },
-    onSuccess: async (data) => {
+    onSuccess: async (data, value) => {
+      if (data.statusCode === 403) {
+        router.push(`/auth/verify-pin?email=${value.email}`);
+        return;
+      }
+
+      if (!data?.success) {
+        toast.error(data?.message);
+        return;
+      }
+
       toast.success(data?.message);
       await queryClient.invalidateQueries({
         queryKey: ["auth"],
@@ -43,7 +53,6 @@ export function LoginForm({ redirect }: { redirect: string }) {
       }
     },
     onError: (error) => {
-      console.log(error);
       toast.error(error?.message);
     },
   });

@@ -9,7 +9,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        <DashboardSidebar />
+        <DashboardSidebar sessionPromise={sessionPromise} />
         <div className="flex-1 flex flex-col min-w-0">
           <DashboardHeader sessionPromise={sessionPromise} />
           {children}
