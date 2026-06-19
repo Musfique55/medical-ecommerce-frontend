@@ -34,36 +34,36 @@ export async function proxy(request: NextRequest) {
   ) {
     try {
       const refreshed = await newRefreshToken();
-      if(refreshed.success){
+      if (refreshed.success) {
         const response = NextResponse.next();
-        response.headers.set("x-token-refreshed","1");
+        response.headers.set("x-token-refreshed", "1");
         response.cookies.set({
-          name : "accessToken",
-          value : refreshed.data.accessToken,
-          sameSite : "none",
-          httpOnly : true,
-          path : "/",
-          secure : true
-        })
+          name: "accessToken",
+          value: refreshed.data.accessToken,
+          sameSite: "none",
+          httpOnly: true,
+          path: "/",
+          secure: true,
+        });
         response.cookies.set({
-          name : "refreshToken",
-          value : refreshed.data.refreshToken,
-          sameSite : "none",
-          httpOnly : true,
-          path : "/",
-          secure : true
-        })
+          name: "refreshToken",
+          value: refreshed.data.refreshToken,
+          sameSite: "none",
+          httpOnly: true,
+          path: "/",
+          secure: true,
+        });
         response.cookies.set({
-          name : "better-auth.session_token",
-          value : refreshed.data.token,
-          sameSite : "none",
-          httpOnly : true,
-          path : "/",
-          secure : true
-        })
+          name: "better-auth.session_token",
+          value: refreshed.data.token,
+          sameSite: "none",
+          httpOnly: true,
+          path: "/",
+          secure: true,
+        });
       }
     } catch (error) {
-      console.log("error on refreshing token",error);
+      console.log("error on refreshing token", error);
     }
   }
   if ((isValidToken || refreshToken) && isAuth) {
@@ -79,8 +79,10 @@ export async function proxy(request: NextRequest) {
   }
 
   if (user) {
-    if (user.emailVerified === false) {
-      return NextResponse.redirect(new URL("/auth/verify-pin", request.url));
+    if (user.emailVerified === false && pathname !== "/auth/verify-pin") {
+      return NextResponse.redirect(
+        new URL(`/auth/verify-pin?email=${user.email}`, request.url),
+      );
     }
 
     if (routesOwner(pathname) === "ADMIN" && user.role !== userRoles.ADMIN) {

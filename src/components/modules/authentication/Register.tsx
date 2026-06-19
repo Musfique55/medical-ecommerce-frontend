@@ -29,6 +29,7 @@ const schema = z.object({
     .string()
     .min(11, "phone number digit must be 11")
     .max(11, "phone number digit must be 11"),
+  role: z.enum(["CUSTOMER", "SELLER"]),
 });
 
 export function Register() {
@@ -42,6 +43,7 @@ export function Register() {
       password: "",
       fullName: "",
       phone: "",
+      role: "CUSTOMER",
     },
     validators: { onSubmit: schema },
     onSubmit: async ({ value }) => {
@@ -234,6 +236,48 @@ export function Register() {
                         )}
                       </button>
                     </div>
+                  </div>
+                );
+              }}
+            />
+
+            <form.Field
+              name="role"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <div>
+                    <Label className="text-base font-semibold text-gray-900 mb-2 block">
+                      Account Type
+                    </Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <button
+                        type="button"
+                        onClick={() => field.handleChange("CUSTOMER")}
+                        className={`h-14 rounded-xl text-base font-semibold border-2 transition-all ${
+                          field.state.value === "CUSTOMER"
+                            ? "bg-blue-50 border-blue-500 text-blue-700"
+                            : "bg-white border-gray-200 text-gray-500 hover:border-blue-200"
+                        }`}
+                      >
+                        Customer
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => field.handleChange("SELLER")}
+                        className={`h-14 rounded-xl text-base font-semibold border-2 transition-all ${
+                          field.state.value === "SELLER"
+                            ? "bg-blue-50 border-blue-500 text-blue-700"
+                            : "bg-white border-gray-200 text-gray-500 hover:border-blue-200"
+                        }`}
+                      >
+                        Seller
+                      </button>
+                    </div>
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
                   </div>
                 );
               }}

@@ -70,3 +70,15 @@ export const getProduct = async (slug: string) => {
     return { data: null, error };
   }
 };
+
+export const getTopProducts = async () => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/medicines/top-medicines`,
+    );
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    return { data: null, error };
+  }
+};

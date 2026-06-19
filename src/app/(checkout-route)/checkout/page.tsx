@@ -3,7 +3,7 @@
 import { ArrowLeft } from "lucide-react";
 import Form from "@/components/modules/checkout/Form";
 import OrderSummary from "@/components/modules/checkout/OrderSummary";
-import OrderConfirmation from "@/components/modules/checkout/OrderConfirmation";
+// import OrderConfirmation from "@/components/modules/checkout/OrderConfirmation";
 import Link from "next/link";
 import useSteps from "@/hooks/useSteps";
 
@@ -43,7 +43,8 @@ export default function CheckoutPage() {
       <div className="container mx-auto px-6 py-12 lg:py-16">
         <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
           {activeStep === 3 ? (
-            <OrderConfirmation />
+            // <OrderConfirmation />
+            "confirmed"
           ) : (
             <>
               {/* Main Form */}
