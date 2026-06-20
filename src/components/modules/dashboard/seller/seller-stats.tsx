@@ -1,45 +1,62 @@
 import { Package, ShoppingCart, TrendingUp, AlertCircle } from "lucide-react";
 
-const SellerStats = () => {
-  const stats = [
-    {
-      label: "Total Products",
-      value: "145",
-      change: "+12.5%",
-      icon: Package,
-      bgColor: "bg-blue-50",
-      iconColor: "text-blue-500",
-    },
-    {
-      label: "Total Orders",
-      value: "1,241",
-      change: "+8.3%",
-      icon: ShoppingCart,
-      bgColor: "bg-teal-50",
-      iconColor: "text-teal-500",
-    },
-    {
-      label: "Total Revenue",
-      value: "$12.8K",
-      change: "+15.2%",
-      icon: TrendingUp,
-      bgColor: "bg-green-50",
-      iconColor: "text-green-500",
-    },
-    {
-      label: "Active Issues",
-      value: "3",
-      change: "-4.5%",
-      icon: AlertCircle,
-      bgColor: "bg-orange-50",
-      iconColor: "text-orange-500",
-    },
-  ];
+interface SellerAnalyticsResponse {
+  total_products: number;
+  total_orders: number;
+  total_revenue: number;
+  product_change_pct: number;
+  order_change_pct: number;
+  revenue_change_pct: number;
+}
+
+const SellerStats = async ({
+  sellerAnalyticsPromise,
+}: {
+  sellerAnalyticsPromise: Promise<{ data: SellerAnalyticsResponse | null }>;
+}) => {
+  const stats = await sellerAnalyticsPromise;
+
+  const statsData = stats
+    ? [
+        {
+          label: "Total Products",
+          value: stats.data?.total_products,
+          change: `${stats.data?.product_change_pct}%`,
+          icon: Package,
+          bgColor: "bg-blue-50",
+          iconColor: "text-blue-500",
+        },
+        {
+          label: "Total Orders",
+          value: stats.data?.total_orders,
+          change: `${stats.data?.order_change_pct}%`,
+          icon: ShoppingCart,
+          bgColor: "bg-teal-50",
+          iconColor: "text-teal-500",
+        },
+        {
+          label: "Total Revenue",
+          value: `$${stats.data?.total_revenue}`,
+          change: `${stats.data?.revenue_change_pct}%`,
+          icon: TrendingUp,
+          bgColor: "bg-green-50",
+          iconColor: "text-green-500",
+        },
+        // {
+        //   label: "Active Issues",
+        //   value: stats.activeissues,
+        //   change: `${stats.activeissues > 0 ? "+" : ""}${stats.activeissues}%`,
+        //   icon: AlertCircle,
+        //   bgColor: "bg-orange-50",
+        //   iconColor: "text-orange-500",
+        // },
+      ]
+    : [];
 
   return (
     <div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, index) => {
+        {statsData.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <div
