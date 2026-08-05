@@ -1,8 +1,22 @@
+import {
+  httpGet,
+  httpPost,
+  httpPut,
+  httpPatch,
+  httpDelete,
+} from "@/helper/http-client";
+
 interface Params {
   category?: string | undefined;
   retails_price?: { gte?: string };
-  "manufacturer.name"?: string | undefined;
+  manufacturer?: string | undefined;
   searchTerm?: string | undefined;
+  isFeatured?: boolean | undefined;
+}
+
+interface SellerOptions {
+  searchTerm?: string | undefined;
+  category?: string | undefined;
 }
 
 interface Options {
@@ -68,6 +82,81 @@ export const getProduct = async (slug: string) => {
     return { data: data.data, error: null };
   } catch (error) {
     return { data: null, error };
+  }
+};
+
+export const getSellerProducts = async (params?: SellerOptions) => {
+  try {
+    const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/seller/medicines`);
+
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value === undefined || value === null || value === "") return;
+        url.searchParams.append(key, value as string);
+      });
+    }
+    console.log(url.toString());
+    const result = await httpGet(url.toString());
+    return result;
+  } catch (error: any) {
+    // throw new Error(error.message);
+    console.log(error);
+  }
+};
+
+export const createSellerProduct = async (data: Record<string, unknown>) => {
+  try {
+    const res = await httpPost(
+      `${process.env.NEXT_PUBLIC_API_URL}/seller/medicines`,
+      {
+        body: data,
+      },
+    );
+    return { data: res, error: null };
+  } catch (error: any) {
+    return { data: null, error: error.message || "Failed to create product" };
+  }
+};
+
+export const updateSellerProduct = async (
+  id: string,
+  data: Record<string, unknown>,
+) => {
+  try {
+    const res = await httpPut(
+      `${process.env.NEXT_PUBLIC_API_URL}/seller/medicines/${id}`,
+      {
+        body: data,
+      },
+    );
+    return { data: res, error: null };
+  } catch (error: any) {
+    return { data: null, error: error.message || "Failed to update product" };
+  }
+};
+
+export const deleteSellerProduct = async (id: string) => {
+  try {
+    const res = await httpDelete(
+      `${process.env.NEXT_PUBLIC_API_URL}/seller/medicines/${id}`,
+    );
+    return { data: res, error: null };
+  } catch (error: any) {
+    return { data: null, error: error.message || "Failed to delete product" };
+  }
+};
+
+export const updateSellerProductStock = async (id: string, stock: number) => {
+  try {
+    const res = await httpPatch(
+      `${process.env.NEXT_PUBLIC_API_URL}/seller/medicines/${id}/stock`,
+      {
+        body: { stock },
+      },
+    );
+    return { data: res, error: null };
+  } catch (error: any) {
+    return { data: null, error: error.message || "Failed to update stock" };
   }
 };
 

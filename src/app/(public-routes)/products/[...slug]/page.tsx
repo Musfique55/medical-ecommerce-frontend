@@ -19,10 +19,10 @@ const ProductDetailsPage = async ({
 
   return (
     <div>
-        <BreadCrumbs
-          product_name={productData?.data?.name}
-          category_name={productData?.data?.category?.category_name}
-        />
+      <BreadCrumbs
+        product_name={productData?.data?.name}
+        category_name={productData?.data?.category_name}
+      />
       <div className="container mx-auto px-6 py-12 lg:py-16">
         {/* Main Product Section */}
         <ProductInfo product={productData.data} />

@@ -7,7 +7,9 @@ import { getProducts } from "@/services/products/products.services";
 import { getCategories } from "@/services/categories/categories.services";
 
 export default async function Home() {
-  const productsPromise = getProducts();
+  const productsPromise = getProducts({
+    isFeatured: true,
+  });
   const categoriesPromise = getCategories();
 
   return (

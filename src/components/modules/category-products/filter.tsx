@@ -2,7 +2,7 @@
 import { Slider } from "@/components/ui/slider";
 import { Category, Manufacturer } from "@/types";
 import { useRouter, useSearchParams } from "next/navigation";
-import { startTransition, useOptimistic, useState } from "react";
+import { startTransition, useCallback, useOptimistic, useState } from "react";
 
 export default function Filters({
   categories,
@@ -26,24 +26,40 @@ export default function Filters({
 
   const [priceRange, setPriceRange] = useState([maxPrice || 0]);
 
-  const handleFilter = (key: string, value: string) => {
-    startTransition(() => {
-      if (key === "category") setOptimisticCategory(value);
-      if (key === "manufacturer") setOptimisticManufacturer(value);
+  const handleFilter = useCallback(
+    (key: string, value: string) => {
+      startTransition(() => {
+        if (key === "category") setOptimisticCategory(value);
+        if (key === "manufacturer") setOptimisticManufacturer(value);
 
-      const params = new URLSearchParams(searchParams.toString());
+        const params = new URLSearchParams(searchParams.toString());
 
-      // Toggle: if same value is clicked again, remove the filter
-      console.log(key, value);
-      if (params.get(key) === value) {
-        params.delete(key);
-      } else {
-        params.set(key, value);
-      }
+        // When selecting a category, clear manufacturer filter (and vice versa)
+        if (key === "category") {
+          // params.delete("manufacturer");
+          params.delete("retails_price[gte]");
+          setPriceRange([maxPrice || 0]);
+          setOptimisticManufacturer("");
+        }
 
-      router.push(`?${params.toString()}`, { scroll: false });
-    });
-  };
+        if (key === "manufacturer") {
+          params.delete("retails_price[gte]");
+          setPriceRange([maxPrice || 0]);
+          setOptimisticCategory("");
+        }
+
+        // Toggle: if same value is clicked again, remove the filter
+        if (params.get(key) === value) {
+          params.delete(key);
+        } else {
+          params.set(key, value);
+        }
+
+        router.push(`?${params.toString()}`, { scroll: false });
+      });
+    },
+    [searchParams, maxPrice, setOptimisticCategory, setOptimisticManufacturer],
+  );
 
   return (
     <div className="w-64 p-6 font-sans shrink-0">

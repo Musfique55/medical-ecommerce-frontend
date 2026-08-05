@@ -38,7 +38,7 @@ const AllCategoriesProductsPage = async ({
           retails_price: retails_price ? { gte: retails_price } : undefined,
           searchTerm: searchTerm || undefined,
           category: category || undefined,
-          "manufacturer.name": manufacturer || undefined,
+          manufacturer: manufacturer || undefined,
         }),
     }),
     queryClient.prefetchQuery({

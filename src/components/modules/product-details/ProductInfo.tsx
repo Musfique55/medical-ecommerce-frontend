@@ -1,23 +1,14 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types";
-import {
-  Check,
-  RotateCcw,
-  Shield,
-  Star,
-  Truck,
-} from "lucide-react";
+import { Check, RotateCcw, Shield, Star, Truck } from "lucide-react";
 import Image from "next/image";
 import CartSection from "./CartSection";
 import TabsSection from "./TabsSection";
 
-
 const ProductInfo = ({ product }: { product: Product }) => {
-  
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50/30 to-white">
-
       <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 mb-16">
         {/* Image Gallery */}
         <div className="space-y-4">
@@ -68,7 +59,7 @@ const ProductInfo = ({ product }: { product: Product }) => {
         <div className="space-y-6">
           <div>
             <div className="text-sm text-blue-600 font-semibold mb-3 uppercase tracking-wide">
-              {product?.category?.category_name}
+              {product?.category_name}
             </div>
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight">
               {product?.name}

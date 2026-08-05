@@ -23,11 +23,14 @@ export interface Product {
   name: string;
   description: string;
   retails_price: number;
+  purchase_price?: number;
   discount_type: "NONE" | "PERCENTAGE" | "FIXED";
   discount_value: number;
   image_url: string[];
-  category: Category;
-  manufacturer: Manufacturer;
+  // category: Category;
+  category_name: string;
+  // manufacturer: Manufacturer;
+  manufacturer_name: string;
   stock: number;
   rating: number;
   reviews: Review[];

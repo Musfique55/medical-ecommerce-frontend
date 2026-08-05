@@ -56,7 +56,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
       <div className="p-4">
         <div className="text-xs text-teal-600 font-semibold mb-1">
-          {product.category.category_name}
+          {product?.category_name}
         </div>
         <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 min-h-10">
           {product.name}
