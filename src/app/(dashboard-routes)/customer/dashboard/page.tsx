@@ -9,6 +9,8 @@ import {
   getDeliveredOrders,
 } from "@/services/orders/orders.services";
 
+export const dynamic = "force-dynamic";
+
 export default async function CustomerDashboard() {
   const activeOrderData = getActiveShippedOrders();
   const allOrdersData = getCustomerOrders();

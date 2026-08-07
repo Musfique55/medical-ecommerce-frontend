@@ -1,20 +1,15 @@
-"use client";
+import { getTopProducts } from "@/services/products/products.services";
 import { Product } from "@/types";
-import { Package, ArrowUp, ArrowDown } from "lucide-react";
+import { Package } from "lucide-react";
 import Link from "next/link";
-import { use } from "react";
 
 interface TopProducts extends Product {
   totalOrders: number;
   totalSold: number;
 }
 
-const TopProducts = ({
-  topProductsPromise,
-}: {
-  topProductsPromise: Promise<{ data: TopProducts[]; error: any }>;
-}) => {
-  const res = use(topProductsPromise);
+const TopProducts = async () => {
+  const res: any = await getTopProducts();
   const products = res.data;
 
   return (
@@ -30,7 +25,7 @@ const TopProducts = ({
       </div>
 
       <div className="space-y-4">
-        {products?.map((product) => (
+        {products?.map((product: TopProducts) => (
           <div
             key={product.id}
             className="border border-gray-200 rounded-xl p-4 hover:border-teal-200 transition-colors"

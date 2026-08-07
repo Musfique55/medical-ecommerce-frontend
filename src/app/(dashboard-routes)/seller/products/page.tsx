@@ -8,6 +8,8 @@ export const metadata: Metadata = {
     "Manage your medicine store catalog, monitor stock, and offer discounts.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function SellerProductsPage({
   searchParams,
 }: {

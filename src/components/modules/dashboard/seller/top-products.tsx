@@ -1,4 +1,3 @@
-import { getTopProducts } from "@/services/products/products.services";
 import { Package } from "lucide-react";
 import { use } from "react";
 
@@ -46,7 +45,8 @@ const TopProducts = ({
             <div className="text-right">
               <p className="font-bold text-gray-900">${product.price}</p>
               <p className="text-xs font-semibold text-teal-600">
-                {product.salesCount || Math.floor(Math.random() * 100) + 10} sold
+                {product.salesCount || Math.floor(Math.random() * 100) + 10}{" "}
+                sold
               </p>
             </div>
           </div>

@@ -79,11 +79,11 @@ export async function proxy(request: NextRequest) {
   }
 
   if (user) {
-    if (user.emailVerified === false && pathname !== "/auth/verify-pin") {
-      return NextResponse.redirect(
-        new URL(`/auth/verify-pin?email=${user.email}`, request.url),
-      );
-    }
+    // if (user.emailVerified === false && pathname !== "/auth/verify-pin") {
+    //   return NextResponse.redirect(
+    //     new URL(`/auth/verify-pin?email=${user.email}`, request.url),
+    //   );
+    // }
 
     if (routesOwner(pathname) === "ADMIN" && user.role !== userRoles.ADMIN) {
       return NextResponse.redirect(

@@ -54,6 +54,7 @@ const axiosInstance = async () => {
 };
 
 const httpGet = async (url: string, options?: AxiosRequestConfig) => {
+  const instance = await axiosInstance();
   try {
     const params = new URLSearchParams();
     for (const key in options?.params) {
@@ -64,7 +65,6 @@ const httpGet = async (url: string, options?: AxiosRequestConfig) => {
 
     const finalURL = `${url}?${params.toString()}`;
 
-    const instance = await axiosInstance();
     const response = await instance.get(finalURL, {
       headers: options?.headers,
     });
@@ -75,8 +75,8 @@ const httpGet = async (url: string, options?: AxiosRequestConfig) => {
 };
 
 const httpPost = async (url: string, options?: AxiosRequestConfig) => {
+  const instance = await axiosInstance();
   try {
-    const instance = await axiosInstance();
     const response = await instance.post(url, options?.body, {
       headers: options?.headers,
     });
@@ -87,8 +87,8 @@ const httpPost = async (url: string, options?: AxiosRequestConfig) => {
 };
 
 const httpPut = async (url: string, options?: AxiosRequestConfig) => {
+  const instance = await axiosInstance();
   try {
-    const instance = await axiosInstance();
     const response = await instance.put(url, options?.body, {
       headers: options?.headers,
     });
@@ -99,8 +99,8 @@ const httpPut = async (url: string, options?: AxiosRequestConfig) => {
 };
 
 const httpPatch = async (url: string, options?: AxiosRequestConfig) => {
+  const instance = await axiosInstance();
   try {
-    const instance = await axiosInstance();
     const response = await instance.patch(url, options?.body, {
       headers: options?.headers,
     });
@@ -111,8 +111,8 @@ const httpPatch = async (url: string, options?: AxiosRequestConfig) => {
 };
 
 const httpDelete = async (url: string, options?: AxiosRequestConfig) => {
+  const instance = await axiosInstance();
   try {
-    const instance = await axiosInstance();
     const response = await instance.delete(url, {
       headers: options?.headers,
     });

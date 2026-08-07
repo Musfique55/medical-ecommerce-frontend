@@ -1,12 +1,6 @@
 "use client";
 import { useState } from "react";
-import {
-  Mail,
-  Lock,
-  Eye,
-  User,
-  EyeOff,
-} from "lucide-react";
+import { Mail, Lock, Eye, User, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,7 +27,6 @@ const schema = z.object({
 });
 
 export function Register() {
-
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
@@ -49,21 +42,20 @@ export function Register() {
     onSubmit: async ({ value }) => {
       const toastId = toast.loading("Please wait signing up...");
       try {
-        const {fullName,...rest} = value;
+        const { fullName, ...rest } = value;
         const res = await register({
           ...rest,
-          name : value.fullName
+          name: value.fullName,
         });
-      
+
         if (res?.success === false) {
           toast.error(res?.error, { id: toastId });
           return;
         }
 
-
-        if(res?.data?.user?.emailVerified === false){
-          router.push(`/auth/verify-pin?email=${res.data.user.email}`)
-        }else{
+        if (res?.data?.user?.emailVerified === false) {
+          router.push(`/auth/verify-pin?email=${res.data.user.email}`);
+        } else {
           router.push("/");
         }
 
@@ -73,7 +65,6 @@ export function Register() {
       }
     },
   });
-
 
   return (
     <div className="min-h-screen bg-linear-to-b from-blue-50/30 to-white flex items-center justify-center px-6 py-12">
@@ -338,7 +329,7 @@ export function Register() {
           <p className="text-gray-600">
             Already have an account?{" "}
             <Link
-              href={"/login"}
+              href={"/auth/login"}
               className="text-blue-600 hover:text-blue-700 font-semibold"
             >
               Sign in

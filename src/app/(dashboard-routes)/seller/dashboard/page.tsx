@@ -1,4 +1,3 @@
-import SellerAnalytics from "@/components/modules/dashboard/seller/seller-analytics";
 import RecentOrders from "@/components/modules/dashboard/seller/recent-orders";
 import IncomingOrders from "@/components/modules/dashboard/seller/incoming-orders";
 import SellerStats from "@/components/modules/dashboard/seller/seller-stats";
@@ -7,6 +6,7 @@ import { getTopProducts } from "@/services/products/products.services";
 import { Suspense } from "react";
 import { getSellerAnalytics } from "@/services/analytics/analytics.services";
 
+export const dynamic = "force-dynamic";
 export default async function SellerDashboard() {
   const topProducts = getTopProducts();
   const sellerAnalytics = getSellerAnalytics();
@@ -15,7 +15,9 @@ export default async function SellerDashboard() {
     <div className="flex flex-col">
       <div className="px-4 sm:px-6 lg:px-8 py-6 lg:py-8 space-y-6">
         {/* Stats Grid */}
-        <SellerStats sellerAnalyticsPromise={sellerAnalytics} />
+        <Suspense>
+          <SellerStats sellerAnalyticsPromise={sellerAnalytics} />
+        </Suspense>
 
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

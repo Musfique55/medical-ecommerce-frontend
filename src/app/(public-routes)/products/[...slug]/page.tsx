@@ -1,21 +1,25 @@
 import BreadCrumbs from "@/components/modules/product-details/BreadCrumbs";
 import ProductInfo from "@/components/modules/product-details/ProductInfo";
-import { getProduct } from "@/services/products/products.services";
+import { getProduct, getProducts } from "@/services/products/products.services";
 import { Product } from "@/types";
 
-// export const generateStaticParams = async () => {
-//   const { data } = await productServices.getProducts();
-//   return data.data.map((product: Product) => ({ id: product.id })).splice(0, 3);
-// };
+export const revalidate = 60;
+
+export const generateStaticParams = async () => {
+  const data = await getProducts();
+  return data
+    .slice(0, 10)
+    .map((product: Product) => ({ slug: [product.slug] }));
+};
 
 const ProductDetailsPage = async ({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string[] }>;
 }) => {
   const { slug } = await params;
 
-  const productData = await getProduct(slug);
+  const productData = await getProduct(slug[0]);
 
   return (
     <div>

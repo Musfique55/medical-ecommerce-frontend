@@ -1,4 +1,4 @@
-import { Package, ShoppingCart, TrendingUp, AlertCircle } from "lucide-react";
+import { Package, ShoppingCart, TrendingUp } from "lucide-react";
 
 interface SellerAnalyticsResponse {
   total_products: number;

@@ -121,7 +121,7 @@ export default function DashboardSidebar({
     if (res?.success) {
       toast.success(res?.message);
       queryClient.clear();
-      router.push("/login");
+      router.push("/auth/login");
     }
   };
 

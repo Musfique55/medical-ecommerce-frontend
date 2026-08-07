@@ -1,6 +1,5 @@
-"use client";
+import { getAllUsers } from "@/services/user/user.services";
 import { User, MoreVertical } from "lucide-react";
-import { use } from "react";
 
 type UserRole = "CUSTOMER" | "ADMIN" | "SELLER";
 type UserStatus = "ban" | "unban";
@@ -18,8 +17,8 @@ interface User {
   updatedAt: string;
 }
 
-const RecentUsers = ({ usersPromise }: { usersPromise: Promise<any> }) => {
-  const res = use(usersPromise);
+const RecentUsers = async () => {
+  const res = await getAllUsers();
   const users = res.data;
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

@@ -2,14 +2,9 @@ import AdminAnalytics from "@/components/modules/dashboard/admin/analytics";
 import RecentUsers from "@/components/modules/dashboard/admin/recent-users";
 import AdminStats from "@/components/modules/dashboard/admin/stats";
 import TopProducts from "@/components/modules/dashboard/admin/top-products";
-import { getTopProducts } from "@/services/products/products.services";
-import { getAllUsers } from "@/services/user/user.services";
 import { Suspense } from "react";
 
-export default async function AdminDashboard() {
-  const users = getAllUsers();
-  const topProducts = getTopProducts();
-
+export default function AdminDashboard() {
   return (
     <div className="flex flex-col">
       <div className="px-4 sm:px-6 lg:px-8 py-6 lg:py-8 space-y-6">
@@ -25,14 +20,14 @@ export default async function AdminDashboard() {
 
             {/* Recent Users */}
             <Suspense fallback={<div>Loading users...</div>}>
-              <RecentUsers usersPromise={users} />
+              <RecentUsers />
             </Suspense>
           </div>
 
           {/* Right Sidebar */}
           <div className="space-y-6">
             <Suspense fallback={<div>Loading top products...</div>}>
-              <TopProducts topProductsPromise={topProducts} />
+              <TopProducts />
             </Suspense>
           </div>
         </div>
